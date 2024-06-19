@@ -1,0 +1,7 @@
+.vscode
+out
+node_modules
+package-lock.json
+*.md
+*.vsix
+*.tgz

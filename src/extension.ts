@@ -1,88 +1,161 @@
+/* Import Section
+vscode - vscodestuf
+bt translate with bing, no api key currently needed
+node:fs - filesystem related stuff
+path - path related stuff
+fast-xml-parser RW XML <> json <> objects
+
+json = buildin
+*/
 import * as vscode from 'vscode';
 import * as bt from 'bing-translate-api';
-import {writeFile} from 'node:fs';
+import {writeFile, readFile, writeFileSync, readFileSync} from 'node:fs';
 import * as path from 'path';
+import {XMLParser, XMLBuilder, XMLValidator} from 'fast-xml-parser';
+import { title } from 'node:process';
 
-const aLn = [
-	{name : "chinese", file : "texts_chinese.xml", short : "zh-Hans"},
-	{name : "Taiwanese", file : "texts_taiwanese.xml", short : "zh-Hant"},
-	{name : "english", file : "texts_english.xml", short : "en"},
-   	{name : "french", file : "texts_french.xml", short : "fr"},
-    {name : "german", file : "texts_german.xml", short : "de"},
-    {name : "italian", file : "texts_italian.xml", short : "it"},
-    {name : "japanese", file : "texts_japanese.xml", short : "ja"},
-    {name : "korean", file : "texts_korean.xml", short : "ko"},
-    {name : "polish", file : "texts_polish.xml", short : "pl"},
-    {name : "russian", file : "texts_russian.xml", short : "ru"},
-    {name : "spanish", file : "texts_spanish.xml", short : "es"}
-];
+/* Global constant declaration 
+aLn - Array with name, short [filename is always 'texts_+name+.xml'] no need to save
+*/
+/* for (const [key, value] of Object.entries(aLn)) {
+		console.log(`${key}: ${value}`);
+	} */
+const aLn : {[key:string]: string} = {
+	chinese : "zh-Hans",
+	taiwanese : "zh-Hant",
+	english : "en",
+   	french : "fr",
+    german : "de",
+    italian : "it",
+    japanese : "ja",
+    korean : "ko",
+    polish : "pl",
+    russian : "ru",
+    spanish : "es"
+};
 
-async function ModInfo() {
-    const editor = vscode.window.activeTextEditor;
-	console.log("startet modinfo");
-	if (editor!.document.fileName.search('modinfo.json') > 0) {
-		for (var k = 0; k < aLn.length; k++) {
-			const regex = new RegExp(aLn[k].name, 'i');
-			// get all lines with translationtext
-			for (var i = 0; i < editor!.document.lineCount; i++) {
-				if (regex.test(editor!.document.lineAt(i).text) && editor!.document.lineAt(i).text.search('null') == -1) {
-					var tSplit = editor!.document.lineAt(i).text.split(":")[1].split("\"")[1];
-					await bt.translate(tSplit, null, aLn[k].short).then(res => {
-						editor!.edit(eBuilder => {
-							var rRange = new vscode.Range(new vscode.Position(i,0),new vscode.Position(i,editor!.document.lineAt(i).text.length))
-							eBuilder.replace(rRange,editor!.document.lineAt(i).text.replaceAll(tSplit,res?.translation as string));
-						})
-					}).catch(err => {
-						console.error(err);
-					});
-				}
-			}
-		}
+/* read files */
+async function readJson(filePath : string):Promise<any> {
+	if (filePath.endsWith('.json')) {
+		const loadedJSON = await readFileSync(filePath, 'utf-8');
+		return JSON.parse(loadedJSON);
 	} else {
-		vscode.window.showInformationMessage('This is not a modinfo.json file!');
-	};
+		console.error('Not a JSON you donkey!');
+		return false;
+	}
 }
 
-async function Texts() {
-    const editor = vscode.window.activeTextEditor;
-	console.log("startet texts");
-	if (editor!.document.fileName.search('texts.*.xml') > 0) {
-		for (var i = 0; i < aLn.length; i++) {
-			if (editor!.document.fileName.search(aLn[i].file) > 0) {
-				const regex = new RegExp('<Text>(.*)</Text>', 'i');
-				// get all lines with translationtext
-				for (var k = 0; k < editor!.document.lineCount; k++) { // 5
-					const vLine = editor!.document.lineAt(k).text;
-					if (regex.test(vLine)) {
-						var tSplit = vLine.match('<Text>(.*)</Text>')![1];
-						await bt.translate(tSplit, null, aLn[i].short).then(res => {
-						editor!.edit(eBuilder => {
-							var match = regex.exec(vLine);
-							var vRange1 = new vscode.Position(k,match!.index+'<Text>'.length);
-							var vRange2 = new vscode.Position(k,match!.index+tSplit.length+'<Text>'.length);
-							var rRange = new vscode.Range(vRange1, vRange2);
-							//console.log("line",k,"text",tSplit,"length",tSplit.length,match!.index);
-							//var rRange = new vscode.Range(new vscode.Position(k,0),new vscode.Position(k,editor!.document.lineAt(k).text.length))
-							eBuilder.delete(rRange);
-							eBuilder.insert(vRange1,res?.translation as string);
-							})
-						}).catch(err => {
-							console.log("line:",k);
-							console.error(err);
-						});
-					} else {
-						console.log("line:",k, editor!.document.lineAt(k).text);
-					} 
-				}
+async function readXML(filePath : string):Promise<any> {
+	/* options for XMLParser */
+	const options = {
+		ignoreAttributes: false,
+		attributeNamePrefix: "@@",
+		format: true,
+		commentPropName: "#comment"
+	};
+	const parser = new XMLParser(options);
+	if (filePath.endsWith('.xml')) {
+		const loadedXML = await readFileSync(filePath, 'utf-8');
+		let parsedXML = parser.parse(loadedXML);
+		return parsedXML;
+	} else {
+		console.error('Not a XML you donkey!');
+		return false;
+	}
+}
+
+/* write files */
+async function writeJSON(filePath : string, pJson : any):Promise<boolean> {
+	await writeFileSync(filePath, JSON.stringify(pJson, null, "\t"));
+	return true;
+}
+
+async function writeXML(filePath : string, pXML : any):Promise<boolean> {
+	const options = {
+		ignoreAttributes: false,
+		attributeNamePrefix: "@@",
+		format: true,
+		commentPropName: "#comment"
+	};
+	
+	const builder = new XMLBuilder(options);
+	const xmlOutput = builder.build(pXML).replaceAll('&apos;',"'");
+	await writeFileSync(filePath, xmlOutput);
+	return true;
+}
+
+/* Translate */
+async function getTranslation(litString:string, sOut:string, sIn?:string|null):Promise<string> {
+	try {
+		var res = bt.translate(litString, sIn, sOut);
+		return (await res).translation;
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage('Caught error with translation of: '+litString);
+		return litString;
+	}
+}
+
+//<Text>Euer &lt;font color='#ff80ffff'&gt;&lt;b&gt;[AssetData(1500001173) Text]&lt;/b&gt;&lt;/font&gt; hat erfolgreich &lt;img height='24' width='24' src="[AssetData(1010017) Icon]"/&gt; &lt;font overrideTextColor="true" color='#ff0000ff'&gt;&lt;b&gt;[AssetData(1010017) Text]&lt;/b&gt;&lt;/font&gt; gestohlen.</Text>
+/* litString = text between <Text> AND </Text> */
+//Euer &lt;font color='#ff80ffff'&gt;&lt;b&gt;[AssetData(1500001173) Text]&lt;/b&gt;&lt;/font&gt; hat erfolgreich &lt;img height='24' width='24' src="[AssetData(1010017) Icon]"/&gt; &lt;font overrideTextColor="true" color='#ff0000ff'&gt;&lt;b&gt;[AssetData(1010017) Text]&lt;/b&gt;&lt;/font&gt; gestohlen.
+function cleanStrings(litString:string): [] {
+	const regex = new RegExp('(&gt;)(.*?)(&lt;)','gi');
+    const nArray = [...litString.matchAll(regex)];
+    for (var i = 0; i < nArray.length; i++) {
+        console.log(nArray[i]);
+    }
+	return []
+}
+
+async function parseTranslate(litString:string):Promise<any> {
+	return;
+}
+
+async function ModInfo(filePath : string):Promise<any> {
+	const pJson = await readJson(filePath);
+	// .Category .ModName .Description
+	for (let jsonCat of ['Category', 'ModName', 'Description']) {
+		for (const [key, value] of Object.entries(pJson[jsonCat])) {
+			if (value !== null) {
+				pJson[jsonCat][key] = await getTranslation(pJson[jsonCat][key],aLn[key.toLowerCase()]);
 			}
 		}
-	} else {
-		vscode.window.showInformationMessage('This is not a texts_ file!');
-	};
+	}
+	await writeJSON(filePath,pJson);
+    vscode.window.showInformationMessage('modinfo.json translated, check new values manually');
+}
+
+async function Texts(filePath : string):Promise<any> {
+	var pXML = await readXML(filePath);
+	const loca = filePath.match('texts_(.*)\.xml')[1];
+	if (typeof(loca) !== 'string') {
+		console.error('donkey');
+		return;
+	}
+	await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: 'Translation in progress',
+          cancellable: false,
+        },
+        async (progress, token) => {
+			for (var i = 0; i < pXML.ModOps.ModOp.length;i++) {
+				if (pXML.ModOps.ModOp[i].Text !== undefined){
+					var percent =  Math.trunc(i/pXML.ModOps.ModOp.length*100);
+					progress.report({message : `${percent}%`, increment: 100/pXML.ModOps.ModOp.length});
+					pXML.ModOps.ModOp[i].Text = await getTranslation(pXML.ModOps.ModOp[i].Text,aLn[loca]);
+				}
+			}
+       	}
+    )
+	vscode.window.showWarningMessage('Translation complete, attempting to write file.');
+	await writeXML(filePath,pXML);
+	vscode.window.showInformationMessage('Translation complete, file written.');
 }
 
 async function createMissingLocaFiles(uri:vscode.Uri, ind:number) {
-	const Path = path.dirname(uri.fsPath);
+	/* const Path = path.dirname(uri.fsPath);
 	for (var i = 0; i < aLn.length; i++) {
 		if (!(i == ind)) {
 			var languageFilePath = path.join(Path, aLn[i].file)
@@ -92,7 +165,7 @@ async function createMissingLocaFiles(uri:vscode.Uri, ind:number) {
 				console.log('The file has been saved!');
 			});
 		}
-	}
+	} */
 }
 
 async function copyMissingLocaFiles(uri:vscode.Uri, ind:number):Promise<void> {
@@ -101,7 +174,7 @@ async function copyMissingLocaFiles(uri:vscode.Uri, ind:number):Promise<void> {
 }
 
 async function getOtherLanguages(uri:vscode.Uri) {
-	var loca : number;
+	/* var loca : number;
 	for (var i = 0; i < aLn.length; i++) {
 		if (uri.fsPath.match(aLn[i].file)) {
 			loca = i;
@@ -121,77 +194,46 @@ async function getOtherLanguages(uri:vscode.Uri) {
 				vscode.window.showErrorMessage('ABORTED!');
 			}
 		});
-	}
-}
-
-async function helloWorld() {
-	const patt = new RegExp('<Text>(.*)</Text>','gi');
-	const str = vscode!.window!.activeTextEditor!.document.lineAt(2).text;
-	//console.log(Array.from(str.matchAll(regex)).map(match => match.index),regex.lastIndex);
-	//Array.from(str.match(regex)).map(match => match.index)
-	
-	
-	//vscode!.window!.activeTextEditor!.edit(eBuilder => {
-	//	eBuilder.insert(vRange1,'+');
-	//	eBuilder.insert(vRange2,'+');
-	//})
+	} */
 }
 
 export function activate(context: vscode.ExtensionContext) {
 
-	console.log('Congratulations, your extension "anno-modding-translator" is now active!');
-	context.subscriptions.push(
+	// console.log('Congratulations, your extension "anno-modding-translator" is now active!');
+	/* context.subscriptions.push(
 		vscode.commands.registerCommand('anno-modding-translator.helloWorld', async () => {
-			helloWorld();
+			const test = readJson(vscode.window.activeTextEditor.document.fileName);
+			helloWorld()
 		})
-	);
+	); */
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anno-modding-translator.Modinfo', async () => {
 			// ModName
 			// Description
 			// activeTextEditor.document.fileName end with modinfo.json
-			ModInfo();
+			const jsonPath = vscode.window.activeTextEditor.document.fileName;
+			await ModInfo(jsonPath);
 		})
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anno-modding-translator.Texts', async () => {
-			// ModName
-			// Description
-			// activeTextEditor.document.fileName end with modinfo.json
-			Texts();
+			const xmlPath = vscode.window.activeTextEditor.document.fileName;
+			await Texts(xmlPath);
 		})
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anno-modding-translator.getOtherLanguages', async (uri:vscode.Uri) => {
-			// ModName
-			// Description
-			// activeTextEditor.document.fileName end with modinfo.json
 			getOtherLanguages(uri);
 		})
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anno-modding-translator.Inplace', async () => {
 			
-			const editor = vscode.window.activeTextEditor;
-			for (var i = 0; i < aLn.length; i++) {
-				bt.translate('Anno Mods are cool', null, aLn[i].short).then(res => {
-					console.log(res?.translation);
-				  }).catch(err => {
-					console.error(err);
-				  });
-			  }
-			if (editor) {
-				let document = editor.document;
-	
-				// Get the document text
-				const documentText = document.getText();
-	
-				// DO SOMETHING WITH `documentText`
-				//console.log(documentText);
-				const regex = new RegExp('test', 'g');
-				documentText.trim()
-				const target = documentText.replace(regex, 'mudda');
-				console.log(target)
+			const mSel = vscode.window.activeTextEditor.selection;
+			if (mSel) {
+				console.log(vscode.window.activeTextEditor.document.getText(mSel));
+			} else {
+				vscode.window.showErrorMessage('Nothing selected to translate!');
 			};
 		})
 	);

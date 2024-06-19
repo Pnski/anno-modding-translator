@@ -3,6 +3,8 @@
 		"module": "Node16",
 		"target": "ES2022",
 		"outDir": "out",
+		"noImplicitAny": true,
+		"strictNullChecks": false, // ignore possible undefined -> risky but better than ! everywhere
 		"lib": [
 			"ES2022"
 		],

@@ -2,8 +2,12 @@
   "name": "anno-modding-translator",
   "displayName": "anno-modding-translator",
   "description": "translate texts.xml",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "icon": "img/icon.png",
+  "publisher": "Pnski",
+  "sponsor": {
+    "url": "https://ko-fi.com/Q5Q4YAI3F"
+  },
   "repository": {
       "type": "git",
       "url": "https://github.com/Pnski/anno-modding-translator"
@@ -12,8 +16,7 @@
     "vscode": "^1.90.0"
   },
   "categories": [
-    "Other",
-    "Languages"
+    "Other"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -40,6 +43,21 @@
         "title": "Make Loca files from this."
       }
     ],
+    "keybindings": [
+      {
+        "command": "anno-modding-translator.Modinfo",
+        "key": "ctrl+alt+t",
+        "mac": "shift+cmd+t"
+      },{
+        "command": "anno-modding-translator.Texts",
+        "key": "ctrl+alt+z",
+        "mac": "shift+cmd+z"
+      },{
+        "command": "anno-modding-translator.Inplace",
+        "key": "ctrl+alt+y",
+        "mac": "shift+cmd+y"
+      }
+    ],
     "menus": {
       "commandPalette": [
         {
@@ -61,8 +79,16 @@
       ],
       "explorer/context": [
         {
-          "when": "resourceFilename =~ /texts_.+xml$/",
           "command": "anno-modding-translator.getOtherLanguages",
+          "when": "resourceFilename =~ /texts_.+xml$/",
+          "group": "AnnoTranslate"
+        },{
+          "command": "anno-modding-translator.Modinfo",
+          "when": "resourceFilename =~ /modinfo.json$/",
+          "group": "AnnoTranslate"
+        },{
+          "command": "anno-modding-translator.Texts",
+          "when": "resourceFilename =~ /texts_.+xml$/",
           "group": "AnnoTranslate"
         }
       ]

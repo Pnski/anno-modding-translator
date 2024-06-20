@@ -65,9 +65,12 @@ async function readXML(filePath : string):Promise<any> {
 }
 
 /* write files */
-async function writeJSON(filePath : string, pJson : any):Promise<boolean> {
-	await writeFileSync(filePath, JSON.stringify(pJson, null, "\t"));
-	return true;
+async function writeJSON(filePath : string, pJson : any):Promise<void> {
+	const data = new Uint8Array(Buffer.from(JSON.stringify(pJson, null, "\t")));
+	await writeFile(filePath, data, (err) => {
+		if (err) throw err;
+		vscode.window.showInformationMessage('File has been saved!');
+	});
 }
 
 async function writeXML(filePath : string, pXML : any):Promise<boolean> {
@@ -79,7 +82,7 @@ async function writeXML(filePath : string, pXML : any):Promise<boolean> {
 	};
 	
 	const builder = new XMLBuilder(options);
-	const xmlOutput = builder.build(pXML).replaceAll('&apos;',"'");
+	const xmlOutput = builder.build(pXML).replaceAll('&apos;',"'").replaceAll('&quot;','"');
 	await writeFileSync(filePath, xmlOutput);
 	return true;
 }
@@ -115,13 +118,26 @@ async function parseTranslate(litString:string):Promise<any> {
 async function ModInfo(filePath : string):Promise<any> {
 	const pJson = await readJson(filePath);
 	// .Category .ModName .Description
-	for (let jsonCat of ['Category', 'ModName', 'Description']) {
-		for (const [key, value] of Object.entries(pJson[jsonCat])) {
-			if (value !== null) {
-				pJson[jsonCat][key] = await getTranslation(pJson[jsonCat][key],aLn[key.toLowerCase()]);
+	await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: 'Translation in progress',
+          cancellable: false,
+        },
+        async (progress, token) => {
+			var i : number = 0;
+			progress.report({message : `${Math.trunc(i/3*100)}%`, increment: 0});
+			for (let jsonCat of ['Category', 'ModName', 'Description']) {
+				for (const [key, value] of Object.entries(pJson[jsonCat])) {
+					if (value !== null) {
+						pJson[jsonCat][key] = await getTranslation(pJson[jsonCat][key],aLn[key.toLowerCase()]);
+					}
+				}
+				i++;
+				progress.report({message : `${Math.trunc(i/3*100)}%`, increment: 100/3});
 			}
-		}
-	}
+       	}
+    )
 	await writeJSON(filePath,pJson);
     vscode.window.showInformationMessage('modinfo.json translated, check new values manually');
 }
@@ -151,26 +167,6 @@ async function Texts(filePath : string):Promise<any> {
     )
 	vscode.window.showWarningMessage('Translation complete, attempting to write file.');
 	await writeXML(filePath,pXML);
-	vscode.window.showInformationMessage('Translation complete, file written.');
-}
-
-async function createMissingLocaFiles(uri:vscode.Uri, ind:number) {
-	/* const Path = path.dirname(uri.fsPath);
-	for (var i = 0; i < aLn.length; i++) {
-		if (!(i == ind)) {
-			var languageFilePath = path.join(Path, aLn[i].file)
-			const data = new Uint8Array(Buffer.from(''));
-			writeFile(languageFilePath, data, (err) => {
-				if (err) throw err;
-				console.log('The file has been saved!');
-			});
-		}
-	} */
-}
-
-async function copyMissingLocaFiles(uri:vscode.Uri, ind:number):Promise<void> {
-	const path = uri.fsPath;
-	return;
 }
 
 async function getOtherLanguages(uri:vscode.Uri) {

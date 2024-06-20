@@ -1,0 +1,61 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/*  MIT License
+
+Copyright (c) 2023 Víctor Peña
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
+/*const fetch = require("node-fetch");
+
+const mirrors = [
+    "https://translate.terraprint.co/translate",
+    "https://trans.zillyhuhn.com/translate",
+]
+
+const libreTranslate = async (text, {from, to}) => {
+    for await (url of mirrors) {
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify({
+                    q: text,
+                    source: from,
+                    target: to,
+                    format: "text",
+                }),
+                headers: { "Content-Type": "application/json" }
+            }).then((res) => res.json());
+            
+            return { text: res.translatedText }
+        } catch (err) {
+            console.log(`Mirror failed: ${url} with the next error:\n\n> ${err.message}\n\nTrying with the next one...\n`);
+        }
+    }
+
+    throw new Error("All libreTranslate mirrors failed. Please try again later.")
+}
+
+const translate = async (text, { from, to }) => {
+    const result = await libreTranslate(text, { from, to });
+
+    return result;
+}
+
+module.exports = { translate }; */ 
+//# sourceMappingURL=libreTranslate.js.map

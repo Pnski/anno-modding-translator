@@ -13,6 +13,7 @@ import {writeFile, readFile, writeFileSync, readFileSync} from 'node:fs';
 import * as path from 'path';
 import {XMLParser, XMLBuilder, XMLValidator} from 'fast-xml-parser';
 import { title } from 'node:process';
+import * as helpers from './Scripts/helpers';
 
 /* Global constant declaration 
 aLn - Array with name, short [filename is always 'texts_+name+.xml'] no need to save
@@ -67,7 +68,7 @@ async function readXML(filePath : string):Promise<any> {
 /* write files */
 async function writeJSON(filePath : string, pJson : any):Promise<void> {
 	const data = new Uint8Array(Buffer.from(JSON.stringify(pJson, null, "\t")));
-	await writeFile(filePath, data, (err) => {
+	writeFile(filePath, data, (err) => {
 		if (err) throw err;
 		vscode.window.showInformationMessage('File has been saved!');
 	});
@@ -96,6 +97,18 @@ async function getTranslation(litString:string, sOut:string, sIn?:string|null):P
 		console.error(err);
 		vscode.window.showErrorMessage('Caught error with translation of: '+litString);
 		return litString;
+	}
+}
+async function getTranslations(litString:string | string[], sOut:string[], sIn?:string|null):Promise<any> {
+	try {
+		const res = await bt.MET.translate(litString, sIn, sOut);
+		console.log(res);
+		for (const [Lang,Text] of Object.entries(res[0].translations)) {
+			console.log(Lang,Text);
+		}
+	} catch (err) {
+		console.error(err);
+		vscode.window.showErrorMessage('Caught error with translation of: '+litString);
 	}
 }
 
@@ -142,8 +155,52 @@ async function ModInfo(filePath : string):Promise<any> {
     vscode.window.showInformationMessage('modinfo.json translated, check new values manually');
 }
 
-async function Texts(filePath : string):Promise<any> {
+async function Texts(filePath : string):Promise<void> {
 	var pXML = await readXML(filePath);
+	const loca = filePath.match('texts_(.*)\.xml')[1];
+	if (typeof(loca) !== 'string') {
+		console.error('donkey');
+		return;
+	}
+	console.log(pXML.ModOps);
+	console.log(helpers.getArrayDepth(pXML.ModOps));
+	await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: 'Translation in progress',
+          cancellable: false,
+        },
+		
+        async (progress, token) => {
+			for (var i = 0; i < pXML.ModOps.ModOp.length;i++) {
+				
+				if (pXML.ModOps.ModOp[i].Text !== undefined){
+					var percent =  Math.trunc(i/pXML.ModOps.ModOp.length*100);
+					progress.report({message : `${percent}%`, increment: 100/pXML.ModOps.ModOp.length});
+					pXML.ModOps.ModOp[i].Text = await getTranslation(pXML.ModOps.ModOp[i].Text,aLn[loca]);
+				}
+			}
+       	}
+    )
+	vscode.window.showWarningMessage('Translation complete, attempting to write file.');
+	await writeXML(filePath,pXML);
+}
+
+async function getOtherLanguages(filePath : string):Promise<void> {
+	const loca = filePath.match('texts_(.*)\.xml')[1];
+	if (typeof(loca) !== 'string') {
+		console.error('donkey');
+		return;
+	}
+	var ttrans = [];
+	for (const [key, value] of Object.entries(aLn)) {
+		if (key !== loca) {
+			ttrans.push(value);
+		}
+	}
+	console.log(loca,ttrans);
+	var str = await getTranslations(['Translation', 'complete, attempting to write file.'],ttrans);
+	/* var pXML = await readXML(filePath);
 	const loca = filePath.match('texts_(.*)\.xml')[1];
 	if (typeof(loca) !== 'string') {
 		console.error('donkey');
@@ -164,33 +221,7 @@ async function Texts(filePath : string):Promise<any> {
 				}
 			}
        	}
-    )
-	vscode.window.showWarningMessage('Translation complete, attempting to write file.');
-	await writeXML(filePath,pXML);
-}
-
-async function getOtherLanguages(uri:vscode.Uri) {
-	/* var loca : number;
-	for (var i = 0; i < aLn.length; i++) {
-		if (uri.fsPath.match(aLn[i].file)) {
-			loca = i;
-			break;
-		}
-	}
-	if (loca! === undefined) { //Failsafe
-		vscode.window.showErrorMessage('Thats not a valid texts_*.xml you donkey!');
-		return;
-	} else { 
-		vscode.window.showInformationMessage('Your selected file is in: "'+aLn[loca].name.toUpperCase()+'" the fellowing procedure will OVERWRITE all other localization files. Do you wish to continue?', 'Yes', 'No').then((item)=>{
-			if (item == 'Yes') {
-				vscode.window.showInformationMessage('starting');
-				createMissingLocaFiles(uri, loca);
-				copyMissingLocaFiles(uri,loca);
-			} else {
-				vscode.window.showErrorMessage('ABORTED!');
-			}
-		});
-	} */
+    ) */
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -219,7 +250,8 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anno-modding-translator.getOtherLanguages', async (uri:vscode.Uri) => {
-			getOtherLanguages(uri);
+			const xmlPath = uri.fsPath ?? vscode.window.activeTextEditor.document.fileName;
+			await getOtherLanguages(xmlPath);
 		})
 	);
 	context.subscriptions.push(

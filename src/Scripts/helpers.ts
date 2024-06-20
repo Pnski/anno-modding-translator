@@ -1,6 +1,6 @@
-export function getObjectDepth(value : object) : any {
-    for (const [key, maps] of Object.fromEntries(value)) {
-        return 1 + Math.max(0, ...value.map(getObjectDepth)) :
-        0;
-    }    
-  }
+/* 
+MoDops - unique
+ModOp - 1 - infinite
+    - add Text: Object
+    - replace Text: string
+*/

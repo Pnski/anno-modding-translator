@@ -7,13 +7,13 @@ fast-xml-parser RW XML <> json <> objects
 
 json = buildin
 */
-import * as vscode from 'vscode';
-import * as bt from 'bing-translate-api';
-import {writeFile, readFile, writeFileSync, readFileSync} from 'node:fs';
-import * as path from 'path';
-import {XMLParser, XMLBuilder, XMLValidator} from 'fast-xml-parser';
-import { title } from 'node:process';
-import * as helpers from './Scripts/helpers';
+import * as vscode from "vscode";
+import * as bt from "bing-translate-api";
+import { writeFile, readFile, writeFileSync, readFileSync } from "node:fs";
+import * as path from "path";
+import { XMLParser, XMLBuilder, XMLValidator } from "fast-xml-parser";
+import { title } from "node:process";
+import * as helpers from "./Scripts/helpers";
 
 /* Global constant declaration 
 aLn - Array with name, short [filename is always 'texts_+name+.xml'] no need to save
@@ -21,32 +21,32 @@ aLn - Array with name, short [filename is always 'texts_+name+.xml'] no need to 
 /* for (const [key, value] of Object.entries(aLn)) {
 		console.log(`${key}: ${value}`);
 	} */
-const aLn : {[key:string]: string} = {
-	chinese : "zh-Hans",
-	taiwanese : "zh-Hant",
-	english : "en",
-   	french : "fr",
-    german : "de",
-    italian : "it",
-    japanese : "ja",
-    korean : "ko",
-    polish : "pl",
-    russian : "ru",
-    spanish : "es"
+const aLn: { [key: string]: string } = {
+	chinese: "zh-Hans",
+	taiwanese: "zh-Hant",
+	english: "en",
+	french: "fr",
+	german: "de",
+	italian: "it",
+	japanese: "ja",
+	korean: "ko",
+	polish: "pl",
+	russian: "ru",
+	spanish: "es"
 };
 
 /* read files */
-async function readJson(filePath : string):Promise<any> {
-	if (filePath.endsWith('.json')) {
-		const loadedJSON = await readFileSync(filePath, 'utf-8');
+async function readJson(filePath: string): Promise<any> {
+	if (filePath.endsWith(".json")) {
+		const loadedJSON = await readFileSync(filePath, "utf-8");
 		return JSON.parse(loadedJSON);
 	} else {
-		console.error('Not a JSON you donkey!');
+		console.error("Not a JSON you donkey!");
 		return false;
 	}
 }
 
-async function readXML(filePath : string):Promise<any> {
+async function readXML(filePath: string): Promise<any> {
 	/* options for XMLParser */
 	const options = {
 		ignoreAttributes: false,
@@ -55,141 +55,183 @@ async function readXML(filePath : string):Promise<any> {
 		commentPropName: "#comment"
 	};
 	const parser = new XMLParser(options);
-	if (filePath.endsWith('.xml')) {
-		const loadedXML = await readFileSync(filePath, 'utf-8');
+	if (filePath.endsWith(".xml")) {
+		const loadedXML = await readFileSync(filePath, "utf-8");
 		let parsedXML = parser.parse(loadedXML);
 		return parsedXML;
 	} else {
-		console.error('Not a XML you donkey!');
+		console.error("Not a XML you donkey!");
 		return false;
 	}
 }
 
 /* write files */
-async function writeJSON(filePath : string, pJson : any):Promise<void> {
+async function writeJSON(filePath: string, pJson: any): Promise<void> {
 	const data = new Uint8Array(Buffer.from(JSON.stringify(pJson, null, "\t")));
-	writeFile(filePath, data, (err) => {
+	writeFile(filePath, data, err => {
 		if (err) throw err;
-		vscode.window.showInformationMessage('File has been saved!');
+		vscode.window.showInformationMessage("File has been saved!");
 	});
 }
 
-async function writeXML(filePath : string, pXML : any):Promise<boolean> {
+async function writeXML(filePath: string, pXML: any): Promise<boolean> {
 	const options = {
 		ignoreAttributes: false,
 		attributeNamePrefix: "@@",
 		format: true,
 		commentPropName: "#comment"
 	};
-	
+
 	const builder = new XMLBuilder(options);
-	const xmlOutput = builder.build(pXML).replaceAll('&apos;',"'").replaceAll('&quot;','"');
+	const xmlOutput = builder.build(pXML).replaceAll("&apos;", "'").replaceAll("&quot;", '"');
 	await writeFileSync(filePath, xmlOutput);
 	return true;
 }
 
 /* Translate */
-async function getTranslation(litString:string, sOut:string, sIn?:string|null):Promise<string> {
+async function getTranslation(litString: string, sOut: string, sIn?: string | null): Promise<string> {
 	try {
 		var res = bt.translate(litString, sIn, sOut);
 		return (await res).translation;
 	} catch (err) {
 		console.error(err);
-		vscode.window.showErrorMessage('Caught error with translation of: '+litString);
+		vscode.window.showErrorMessage("Caught error with translation of: " + litString);
 		return litString;
 	}
 }
-async function getTranslations(litString:string | string[], sOut:string[], sIn?:string|null):Promise<any> {
+async function getTranslations(litString: string | string[], sOut: string[], sIn?: string | null): Promise<any> {
 	try {
 		const res = await bt.MET.translate(litString, sIn, sOut);
 		console.log(res);
-		for (const [Lang,Text] of Object.entries(res[0].translations)) {
-			console.log(Lang,Text);
+		for (const [Lang, Text] of Object.entries(res[0].translations)) {
+			console.log(Lang, Text);
 		}
 	} catch (err) {
 		console.error(err);
-		vscode.window.showErrorMessage('Caught error with translation of: '+litString);
+		vscode.window.showErrorMessage("Caught error with translation of: " + litString);
 	}
 }
 
 //<Text>Euer &lt;font color='#ff80ffff'&gt;&lt;b&gt;[AssetData(1500001173) Text]&lt;/b&gt;&lt;/font&gt; hat erfolgreich &lt;img height='24' width='24' src="[AssetData(1010017) Icon]"/&gt; &lt;font overrideTextColor="true" color='#ff0000ff'&gt;&lt;b&gt;[AssetData(1010017) Text]&lt;/b&gt;&lt;/font&gt; gestohlen.</Text>
 /* litString = text between <Text> AND </Text> */
 //Euer &lt;font color='#ff80ffff'&gt;&lt;b&gt;[AssetData(1500001173) Text]&lt;/b&gt;&lt;/font&gt; hat erfolgreich &lt;img height='24' width='24' src="[AssetData(1010017) Icon]"/&gt; &lt;font overrideTextColor="true" color='#ff0000ff'&gt;&lt;b&gt;[AssetData(1010017) Text]&lt;/b&gt;&lt;/font&gt; gestohlen.
-function cleanStrings(litString:string): [] {
-	const regex = new RegExp('(&gt;)(.*?)(&lt;)','gi');
-    const nArray = [...litString.matchAll(regex)];
-    for (var i = 0; i < nArray.length; i++) {
-        console.log(nArray[i]);
-    }
-	return []
+function cleanStrings(litString: string): [] {
+	const regex = new RegExp("(&gt;)(.*?)(&lt;)", "gi");
+	const nArray = [...litString.matchAll(regex)];
+	for (var i = 0; i < nArray.length; i++) {
+		console.log(nArray[i]);
+	}
+	return [];
 }
 
-async function parseTranslate(litString:string):Promise<any> {
+async function parseTranslate(litString: string): Promise<any> {
 	return;
 }
 
-async function ModInfo(filePath : string):Promise<any> {
+async function ModInfo(filePath: string): Promise<any> {
 	const pJson = await readJson(filePath);
 	// .Category .ModName .Description
 	await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: 'Translation in progress',
-          cancellable: false,
-        },
-        async (progress, token) => {
-			var i : number = 0;
-			progress.report({message : `${Math.trunc(i/3*100)}%`, increment: 0});
-			for (let jsonCat of ['Category', 'ModName', 'Description']) {
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: "Translation in progress",
+			cancellable: false
+		},
+		async (progress, token) => {
+			var i: number = 0;
+			progress.report({
+				message: `${Math.trunc((i / 3) * 100)}%`,
+				increment: 0
+			});
+			for (let jsonCat of ["Category", "ModName", "Description"]) {
 				for (const [key, value] of Object.entries(pJson[jsonCat])) {
 					if (value !== null) {
-						pJson[jsonCat][key] = await getTranslation(pJson[jsonCat][key],aLn[key.toLowerCase()]);
+						pJson[jsonCat][key] = await getTranslation(pJson[jsonCat][key], aLn[key.toLowerCase()]);
 					}
 				}
 				i++;
-				progress.report({message : `${Math.trunc(i/3*100)}%`, increment: 100/3});
+				progress.report({
+					message: `${Math.trunc((i / 3) * 100)}%`,
+					increment: 100 / 3
+				});
 			}
-       	}
-    )
-	await writeJSON(filePath,pJson);
-    vscode.window.showInformationMessage('modinfo.json translated, check new values manually');
+		}
+	);
+	await writeJSON(filePath, pJson);
+	vscode.window.showInformationMessage("modinfo.json translated, check new values manually");
 }
 
-async function Texts(filePath : string):Promise<void> {
+async function gTexts(Texts: any): Promise<any> {
+	if (Texts.length == undefined) {
+		// single Text
+	} else {
+		// multi Text
+	}
+	return Texts;
+}
+
+async function gModOps(ModOp: any): Promise<any> {
+	if (ModOp.length == undefined) {
+		//single ModOp
+		ModOp = await gTexts(ModOp);
+	} else {
+		// multi ModOp
+		for (var i = 0; i < ModOp.length; i++) {
+			ModOp[i].Text = await gTexts(ModOp[i].Text);
+		}
+	}
+	return ModOp;
+}
+
+async function Texts(filePath: string): Promise<void> {
 	var pXML = await readXML(filePath);
-	const loca = filePath.match('texts_(.*)\.xml')[1];
-	if (typeof(loca) !== 'string') {
-		console.error('donkey');
+	const loca = filePath.match("texts_(.*).xml")[1];
+	if (typeof loca !== "string") {
+		console.error("donkey");
 		return;
 	}
-	console.log(pXML.ModOps);
-	console.log(helpers.getArrayDepth(pXML.ModOps));
+	console.log(1, pXML);
 	await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: 'Translation in progress',
-          cancellable: false,
-        },
-		
-        async (progress, token) => {
-			for (var i = 0; i < pXML.ModOps.ModOp.length;i++) {
-				
-				if (pXML.ModOps.ModOp[i].Text !== undefined){
-					var percent =  Math.trunc(i/pXML.ModOps.ModOp.length*100);
-					progress.report({message : `${percent}%`, increment: 100/pXML.ModOps.ModOp.length});
-					pXML.ModOps.ModOp[i].Text = await getTranslation(pXML.ModOps.ModOp[i].Text,aLn[loca]);
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: "Translation in progress",
+			cancellable: false
+		},
+		async (progress, token) => {
+			console.log("starting", typeof pXML.ModOps.ModOp);
+			await gModOps(pXML.ModOps.ModOp);
+			for (var ModOp = 0; ModOp < (pXML.ModOps.ModOp.length ??= 1); ModOp++) {
+				progress.report({ message: `${ModOp} of ${pXML.ModOps.ModOp.length}` });
+				// 1-inf ModOp
+				console.log("ModOp", pXML.ModOps.ModOp[ModOp]);
+				switch (typeof pXML.ModOps.ModOp[ModOp].Text) {
+					case "string":
+						pXML.ModOps.ModOp[ModOp].Text = await getTranslation(pXML.ModOps.ModOp[ModOp].Text, aLn[loca]);
+						break;
+					case "object":
+						for (var Text = 0; Text < (pXML.ModOps.ModOp[ModOp].Text.length ??= 1); Text++) {
+							console.log(Text, pXML.ModOps.ModOp[ModOp].Text[Text], pXML.ModOps.ModOp[ModOp].Text[Text].Text);
+							if (pXML.ModOps.ModOp[ModOp].Text[Text].Text !== undefined) {
+								pXML.ModOps.ModOp[ModOp].Text[Text].Text = await getTranslation(pXML.ModOps.ModOp[ModOp].Text[Text].Text, aLn[loca]);
+							}
+						}
+						break;
+					default:
+						console.warn(pXML.ModOps.ModOp[ModOp] + "text=" + typeof pXML.ModOps.ModOp[ModOp].Text);
+						break;
 				}
 			}
-       	}
-    )
-	vscode.window.showWarningMessage('Translation complete, attempting to write file.');
-	await writeXML(filePath,pXML);
+		}
+	);
+	console.log(2, pXML);
+	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
+	await writeXML(filePath, pXML);
 }
 
-async function getOtherLanguages(filePath : string):Promise<void> {
-	const loca = filePath.match('texts_(.*)\.xml')[1];
-	if (typeof(loca) !== 'string') {
-		console.error('donkey');
+async function getOtherLanguages(filePath: string): Promise<void> {
+	const loca = filePath.match("texts_(.*).xml")[1];
+	if (typeof loca !== "string") {
+		console.error("donkey");
 		return;
 	}
 	var ttrans = [];
@@ -198,8 +240,8 @@ async function getOtherLanguages(filePath : string):Promise<void> {
 			ttrans.push(value);
 		}
 	}
-	console.log(loca,ttrans);
-	var str = await getTranslations(['Translation', 'complete, attempting to write file.'],ttrans);
+	console.log(loca, ttrans);
+	var str = await getTranslations(["Translation", "complete, attempting to write file."], ttrans);
 	/* var pXML = await readXML(filePath);
 	const loca = filePath.match('texts_(.*)\.xml')[1];
 	if (typeof(loca) !== 'string') {
@@ -225,7 +267,6 @@ async function getOtherLanguages(filePath : string):Promise<void> {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-
 	// console.log('Congratulations, your extension "anno-modding-translator" is now active!');
 	/* context.subscriptions.push(
 		vscode.commands.registerCommand('anno-modding-translator.helloWorld', async () => {
@@ -234,7 +275,7 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	); */
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anno-modding-translator.Modinfo', async () => {
+		vscode.commands.registerCommand("anno-modding-translator.Modinfo", async () => {
 			// ModName
 			// Description
 			// activeTextEditor.document.fileName end with modinfo.json
@@ -243,29 +284,28 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anno-modding-translator.Texts', async () => {
+		vscode.commands.registerCommand("anno-modding-translator.Texts", async () => {
 			const xmlPath = vscode.window.activeTextEditor.document.fileName;
 			await Texts(xmlPath);
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anno-modding-translator.getOtherLanguages', async (uri:vscode.Uri) => {
+		vscode.commands.registerCommand("anno-modding-translator.getOtherLanguages", async (uri: vscode.Uri) => {
 			const xmlPath = uri.fsPath ?? vscode.window.activeTextEditor.document.fileName;
 			await getOtherLanguages(xmlPath);
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anno-modding-translator.Inplace', async () => {
-			
+		vscode.commands.registerCommand("anno-modding-translator.Inplace", async () => {
 			const mSel = vscode.window.activeTextEditor.selection;
 			if (mSel) {
 				console.log(vscode.window.activeTextEditor.document.getText(mSel));
 			} else {
-				vscode.window.showErrorMessage('Nothing selected to translate!');
-			};
+				vscode.window.showErrorMessage("Nothing selected to translate!");
+			}
 		})
 	);
-};
+}
 
 // This method is called when your extension is deactivated
 export function deactivate() {}

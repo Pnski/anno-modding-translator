@@ -12,15 +12,7 @@ Anno 1800 is a trademark of Ubisoft Entertainment in the US and/or other countri
   - Navigate via Outline
   - Jump to asset from any GUID by right click or `Ctrl+T`
 - Commands
-  - [Compare](#command-compare): Apply mod and compare unpatched vs patched
-  - [Build and Deploy](./doc/annomod.md): Copy your mod to the `mods/` folder and generate DDS (with LODs) and other files automatically.
-  - [Import from Blender or glTF](#import-from-blender-or-gltf) to `.cfg`, `.ifo` and `.cf7`
-  - Various right-click utilities to convert between Anno and editable formats (glTF, PNG, ...)
-- Auto-completion
-  - [GUID conversion](#guid-conversion)
-  - [Assets XML auto completion](#auto-completion)
-- Other
-  - [Reskin existing models](#quickly-reskin-existing-models) without touching `.cfg`, ...
+  - 
 
 See [Feature Details](#feature-details) for more, or [CHANGELOG](./CHANGELOG.md) for recent changes.
 

@@ -13,7 +13,12 @@ import { writeFile, readFile, writeFileSync, readFileSync } from "node:fs";
 import * as path from "path";
 import { XMLParser, XMLBuilder, XMLValidator } from "fast-xml-parser";
 import { title } from "node:process";
-import * as helpers from "./Scripts/helpers";
+//@ts-ignore
+import * as hModOp from "./Scripts/ModOp";
+//@ts-ignore
+import * as hFiles from "./Scripts/Files";
+//@ts-ignore
+import * as hTrans from "./Scripts/Translation";
 
 /* Global constant declaration 
 aLn - Array with name, short [filename is always 'texts_+name+.xml'] no need to save

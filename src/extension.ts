@@ -94,7 +94,7 @@ async function getTranslation(litString: string, sOut: string, sIn?: string | nu
 		var res = bt.translate(litString, sIn, sOut);
 		return (await res).translation;
 	} catch (err) {
-		console.error(err);
+		console.error("Caught error in machinetranslation of "+litString+" due to unknown reason (internet related).");
 		vscode.window.showErrorMessage("Caught error with translation of: " + litString);
 		return litString;
 	}
@@ -161,26 +161,55 @@ async function ModInfo(filePath: string): Promise<any> {
 	vscode.window.showInformationMessage("modinfo.json translated, check new values manually");
 }
 
-async function gTexts(Texts: any): Promise<any> {
-	if (Texts.length == undefined) {
-		// single Text
+async function tText(Text : any, loca:string):Promise<string> {
+	if (typeof Text == 'string'){
+		return await getTranslation(Text, loca);
 	} else {
-		// multi Text
+		return '';
 	}
-	return Texts;
 }
 
-async function gModOps(ModOp: any): Promise<any> {
-	if (ModOp.length == undefined) {
-		//single ModOp
-		ModOp = await gTexts(ModOp);
-	} else {
-		// multi ModOp
-		for (var i = 0; i < ModOp.length; i++) {
-			ModOp[i].Text = await gTexts(ModOp[i].Text);
+async function gTexts(Texts: any, loca : string): Promise<any> {
+	switch (typeof Texts) {
+		case "string": {
+			// single Text
+			return await tText(Texts, loca);
+		}
+		case "object": {
+			// Nested Texts
+			if (typeof Texts.length == "undefined") {
+				return await tText(Texts.Text, loca);
+			} else {
+				for (var i = 0; i < Texts.length; i++) {
+					console.log("Translating multiple lines in ModOp ["+i+" / "+Texts.length+"]:", Texts[i].Text.substr(0,20).concat(' ...'));
+					Texts[i].Text = await tText(Texts[i].Text, loca);
+				}
+				return await Texts;
+			}
+		}
+		default: {
+			vscode.window.showWarningMessage("Error Text not found in ModOp! Returning emtpy Text!");
+			return "";
 		}
 	}
-	return ModOp;
+}
+
+async function gModOps(ModOp: any, loca : string): Promise<any> {
+	if (typeof ModOp == "undefined") {
+		vscode.window.showWarningMessage("Error ModOp not found in ModOps!");
+	} else {
+		if (typeof ModOp.length == "undefined") {
+			//single ModOp
+			ModOp = await gTexts(ModOp.Text, loca);
+			return ModOp;
+		} else {
+			// multi ModOp
+			for (var i = 0; i < ModOp.length; i++) {
+				ModOp[i].Text = await gTexts(ModOp[i].Text, loca);
+			}
+			return await ModOp;
+		}
+	}
 }
 
 async function Texts(filePath: string): Promise<void> {
@@ -190,40 +219,16 @@ async function Texts(filePath: string): Promise<void> {
 		console.error("donkey");
 		return;
 	}
-	console.log(1, pXML);
 	await vscode.window.withProgress(
 		{
 			location: vscode.ProgressLocation.Notification,
-			title: "Translation in progress",
+			title: "Translation in progress...",
 			cancellable: false
 		},
 		async (progress, token) => {
-			console.log("starting", typeof pXML.ModOps.ModOp);
-			await gModOps(pXML.ModOps.ModOp);
-			for (var ModOp = 0; ModOp < (pXML.ModOps.ModOp.length ??= 1); ModOp++) {
-				progress.report({ message: `${ModOp} of ${pXML.ModOps.ModOp.length}` });
-				// 1-inf ModOp
-				console.log("ModOp", pXML.ModOps.ModOp[ModOp]);
-				switch (typeof pXML.ModOps.ModOp[ModOp].Text) {
-					case "string":
-						pXML.ModOps.ModOp[ModOp].Text = await getTranslation(pXML.ModOps.ModOp[ModOp].Text, aLn[loca]);
-						break;
-					case "object":
-						for (var Text = 0; Text < (pXML.ModOps.ModOp[ModOp].Text.length ??= 1); Text++) {
-							console.log(Text, pXML.ModOps.ModOp[ModOp].Text[Text], pXML.ModOps.ModOp[ModOp].Text[Text].Text);
-							if (pXML.ModOps.ModOp[ModOp].Text[Text].Text !== undefined) {
-								pXML.ModOps.ModOp[ModOp].Text[Text].Text = await getTranslation(pXML.ModOps.ModOp[ModOp].Text[Text].Text, aLn[loca]);
-							}
-						}
-						break;
-					default:
-						console.warn(pXML.ModOps.ModOp[ModOp] + "text=" + typeof pXML.ModOps.ModOp[ModOp].Text);
-						break;
-				}
-			}
+			pXML.ModOps.ModOp = await gModOps(pXML.ModOps.ModOp, aLn[loca.toLowerCase()]);
 		}
 	);
-	console.log(2, pXML);
 	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
 	await writeXML(filePath, pXML);
 }

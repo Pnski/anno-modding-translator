@@ -80,7 +80,7 @@
         },
         {
           "command": "anno-modding-translator.Inplace",
-          "when": "true"
+          "when": "false"
         },
         {
           "command": "anno-modding-translator.getOtherLanguages",
@@ -90,7 +90,7 @@
       "explorer/context": [
         {
           "command": "anno-modding-translator.getOtherLanguages",
-          "when": "resourceFilename =~ /texts_.+xml$/",
+          "when": "false",
           "group": "AnnoTranslate"
         },
         {

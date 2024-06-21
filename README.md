@@ -8,7 +8,7 @@ Anno 1800 is a trademark of Ubisoft Entertainment in the US and/or other countri
 
 - [ModInfo.Json](#Modinfo.json)
   - 
-- [Texts](#navigation)
+- [Texts](#Texts)
   - Navigate via Outline
   - Jump to asset from any GUID by right click or `Ctrl+T`
 - Commands
@@ -28,12 +28,28 @@ See [Feature Details](#feature-details) for more, or [CHANGELOG](./CHANGELOG.md)
 
 ## Setup
 
+tbd
+
 ### 
 ---
 
+## Shortcuts
+| Keybind | Command |
+| --- | --- |
+| ctrl+alt+t | Modinfo |
+| ctrl+alt+z | Single Texts |
+| ctrl+alt+y | Inline |
+
+---
 ## Feature Details
 
-### Annotations, Live Analysis, Syntax
+### ModInfo.json
+
+### Texts_Lang.xml
+
+Asynchronus Task, you can run multiple at the same time, but its getting lots of errors in my tests, therefor a new command will come in the future!
+
+Translates the \<Text\> of a single document. The translation is trying to autodetect the given language and will translate it to the language of the filename.
 
 
 

@@ -5,6 +5,8 @@
 		"outDir": "out",
 		"noImplicitAny": true,
 		"strictNullChecks": false, // ignore possible undefined -> risky but better than ! everywhere
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
 		"lib": [
 			"ES2022"
 		],

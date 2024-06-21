@@ -2,7 +2,7 @@
   "name": "anno-modding-translator",
   "displayName": "anno-modding-translator",
   "description": "translate texts.xml",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "icon": "img/icon.png",
   "publisher": "Pnski",
   "sponsor": {
@@ -18,12 +18,15 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
-  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/src/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "anno-modding-translator.helloWorld",
+        "command": "anno-modding-translator.testingStuff",
+        "category": "testing",
         "title": "Hello World"
       },
       {
@@ -67,8 +70,8 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "anno-modding-translator.helloWorld",
-          "when": "false"
+          "command": "anno-modding-translator.testingStuff",
+          "when": "true"
         },
         {
           "command": "anno-modding-translator.Modinfo",
@@ -115,14 +118,10 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/google-translate-api": "^2.3.5",
-    "@types/mocha": "^10.0.6",
     "@types/node": "20.x",
     "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
-    "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.4.0",
     "eslint": "^8.57.0",
     "typescript": "^5.4.5"
   },
@@ -130,7 +129,6 @@
     "bing-translate-api": "^4.0.2",
     "fast-xml-parser": "^4.4.0",
     "fs": "^0.0.1-security",
-    "node-fetch": "^3.3.2",
     "path": "^0.12.7"
   }
 }

@@ -150,7 +150,7 @@
 				},
 				{
 					"command": "anno-modding-translator.getOtherLanguages",
-					"when": "false"
+					"when": "true"
 				}
 			],
 			"explorer/context": [
@@ -161,7 +161,7 @@
 				},
 				{
 					"command": "anno-modding-translator.getOtherLanguages",
-					"when": "false",
+					"when": "true",
 					"group": "AnnoTranslate"
 				},
 				{
@@ -197,7 +197,6 @@
 		"bing-translate-api": "^4.0.2",
 		"fast-xml-parser": "^4.4.0",
 		"fs": "^0.0.1-security",
-		"glob": "^10.4.2",
 		"path": "^0.12.7"
 	}
 }

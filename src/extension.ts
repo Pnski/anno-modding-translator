@@ -107,55 +107,58 @@ async function Texts(filePath: string): Promise<void> {
 }
 
 async function getOtherLanguages(filePath: string): Promise<void> {
-	const loca = filePath.match("texts_(.*).xml")[1];
+	const loca = filePath.match("texts_(.*).xml")[1]; // current language
+	const pXML = await hFiles.readXML(filePath);
 	if (typeof loca !== "string") {
 		console.error("donkey");
 		return;
 	}
+	const diffLang = await vscode.window.showInformationMessage("Do you want to recreate ALL other languages extept for ${loca}?", "Yes", "No").then(answer => {
+		if (answer === "Yes")
+			// delete all other files first than get diff
+			return (hHelper.getMLanguages([loca], hHelper.getCLanguages(aLn)));
+		else 
+			return (hHelper.getALanguages(filePath, aLn)[1]);
+	});
+	let _pXML = await hModOp.gMModOps(pXML.ModOps,diffLang);
+	console.log("_pxmlout",_pXML);
+	return;
 	
-	//console.log(loca, ttrans);
-	//var str = await hTrans.getTranslations(["Translation", "complete, attempting to write file."], ttrans);
-	/* var pXML = await hFiles.readXML(filePath);
-	const loca = filePath.match('texts_(.*)\.xml')[1];
-	if (typeof(loca) !== 'string') {
-		console.error('donkey');
-		return;
-	}
+	console.log(hHelper.getALanguages(filePath, aLn)); // array found languages and diff languages
+	
 	await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: 'Translation in progress',
-          cancellable: false,
-        },
-        async (progress, token) => {
-			for (var i = 0; i < pXML.ModOps.ModOp.length;i++) {
-				if (pXML.ModOps.ModOp[i].Text !== undefined){
-					var percent =  Math.trunc(i/pXML.ModOps.ModOp.length*100);
-					progress.report({message : `${percent}%`, increment: 100/pXML.ModOps.ModOp.length});
-					pXML.ModOps.ModOp[i].Text = await hTrans.getTranslation(pXML.ModOps.ModOp[i].Text,aLn[loca]);
-				}
-			}
-       	}
-    ) */
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: "Translation in progress...",
+			cancellable: false
+		},
+		async (progress, token) => {
+			//pXML.ModOps.ModOp = await hModOp.gMModOps(pXML.ModOps.ModOp, diffLang);
+		}
+	);
+	//vscode.window.showWarningMessage("Translation complete, attempting to write file.");
+	//await hFiles.writeXML(filePath, pXML);
 }
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "anno-modding-translator" is now active!');
 	context.subscriptions.push(
-		vscode.commands.registerCommand("anno-modding-translator.testingStuff", (uri: vscode.Uri) => {
-		/* 	for (let [key, value] of Object.entries(aLn)) {
+		vscode.commands.registerCommand("anno-modding-translator.testingStuff", async (uri: vscode.Uri) => {
+			/* 	for (let [key, value] of Object.entries(aLn)) {
 				console.log(typeof key, typeof value);
 			}
 			const str : string =  "Chinese";
 		uri.path
 		console.log(aLn[str.toLowerCase()])
 		console.log("hello world"); */
-		var path = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
-		console.log(hFiles.readDir(path));
+			var path = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
+			//console.log(hFiles.readDir(path));
+			const _t = await hTrans.getTranslations("deine mutter mag luftschiffe!", hHelper.getALanguages(path, aLn)[1]);
+			console.error(_t);
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand("anno-modding-translator.Modinfo", async (uri : vscode.Uri) => {
+		vscode.commands.registerCommand("anno-modding-translator.Modinfo", async (uri: vscode.Uri) => {
 			// ModName
 			// Description
 			// activeTextEditor.document.fileName end with modinfo.json
@@ -164,7 +167,7 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand("anno-modding-translator.Texts", async (uri : vscode.Uri) => {
+		vscode.commands.registerCommand("anno-modding-translator.Texts", async (uri: vscode.Uri) => {
 			const xmlPath = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
 			await Texts(xmlPath);
 		})

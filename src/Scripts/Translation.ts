@@ -12,13 +12,14 @@ export async function getTranslation(litString: string, sOut: string, sIn?: stri
 		return litString;
 	}
 }
-export async function getTranslations(litString: string | string[], sOut: string[], sIn?: string | null): Promise<any> {
+export async function getTranslations(litString: string, sOut: string[], sIn?: string | null): Promise<{ [key: string]: string }> {
 	try {
 		const res = await bt.MET.translate(litString, sIn, sOut);
-		console.log(res);
-		for (const [Lang, Text] of Object.entries(res[0].translations)) {
-			console.log(Lang, Text);
-		}
+		var _text : { [key: string]: string } = {};
+		for (const [Lang, Text] of Object.entries(res[0].translations)) 
+			_text[Text.to] = (Text.text)
+		console.log("text",_text);
+		return _text;
 	} catch (err) {
 		console.error(err);
 		vscode.window.showErrorMessage("Caught error with translation of: " + litString);

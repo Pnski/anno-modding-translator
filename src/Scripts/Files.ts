@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { writeFile, readFile, writeFileSync, readFileSync } from "node:fs";
+import { writeFile, readFile, writeFileSync, readFileSync, readdirSync } from "node:fs";
 import * as path from "path";
 import { XMLParser, XMLBuilder, XMLValidator } from "fast-xml-parser";
 
@@ -54,4 +54,8 @@ export async function writeXML(filePath: string, pXML: any): Promise<boolean> {
 	const xmlOutput = builder.build(pXML).replaceAll("&apos;", "'").replaceAll("&quot;", '"');
 	await writeFileSync(filePath, xmlOutput);
 	return true;
+}
+
+export function readDir(filePath: string): string[] {
+	return readdirSync(filePath.substring(0, filePath.lastIndexOf("\\") + 1));
 }

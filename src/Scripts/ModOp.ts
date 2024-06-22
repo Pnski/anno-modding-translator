@@ -1,16 +1,15 @@
 import * as vscode from "vscode";
-//@ts-ignore
-import * as hTrans from "./Scripts/Translation";
+import * as hTrans from "./Translation";
 
-async function tText(Text : any, loca:string):Promise<string> {
-	if (typeof Text == 'string'){
+async function tText(Text: any, loca: string): Promise<string> {
+	if (typeof Text == "string") {
 		return await hTrans.getTranslation(Text, loca);
 	} else {
-		return '';
+		return "";
 	}
 }
 
-async function gTexts(Texts: any, loca : string): Promise<any> {
+async function gTexts(Texts: any, loca: string): Promise<any> {
 	switch (typeof Texts) {
 		case "string": {
 			// single Text
@@ -22,7 +21,7 @@ async function gTexts(Texts: any, loca : string): Promise<any> {
 				return await tText(Texts.Text, loca);
 			} else {
 				for (var i = 0; i < Texts.length; i++) {
-					console.log("Translating multiple lines in ModOp ["+i+" / "+Texts.length+"]:", Texts[i].Text.substr(0,20).concat(' ...'));
+					console.log("Translating multiple lines in ModOp [" + i + " / " + Texts.length + "]:", Texts[i].Text.substr(0, 20).concat(" ..."));
 					Texts[i].Text = await tText(Texts[i].Text, loca);
 				}
 				return await Texts;
@@ -35,7 +34,7 @@ async function gTexts(Texts: any, loca : string): Promise<any> {
 	}
 }
 
-export async function gModOps(ModOp: any, loca : string): Promise<any> {
+export async function gModOps(ModOp: any, loca: string): Promise<any> {
 	if (typeof ModOp == "undefined") {
 		vscode.window.showWarningMessage("Error ModOp not found in ModOps!");
 	} else {

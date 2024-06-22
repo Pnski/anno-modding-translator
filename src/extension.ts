@@ -14,6 +14,7 @@ import * as hModOp from "./Scripts/ModOp";
 import * as hFiles from "./Scripts/Files";
 //@ts-ignore
 import * as hTrans from "./Scripts/Translation";
+import * as hHelper from "./Scripts/Helper";
 
 /* Global constant declaration 
 aLn - Array with name, short [filename is always 'texts_+name+.xml'] no need to save
@@ -141,33 +142,36 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "anno-modding-translator" is now active!');
 	context.subscriptions.push(
-		vscode.commands.registerCommand("anno-modding-translator.testingStuff", () => {
-			for (let [key, value] of Object.entries(aLn)) {
+		vscode.commands.registerCommand("anno-modding-translator.testingStuff", (uri: vscode.Uri) => {
+		/* 	for (let [key, value] of Object.entries(aLn)) {
 				console.log(typeof key, typeof value);
 			}
 			const str : string =  "Chinese";
+		uri.path
 		console.log(aLn[str.toLowerCase()])
-		console.log("hello world");
+		console.log("hello world"); */
+		var path = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
+		console.log(hFiles.readDir(path));
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand("anno-modding-translator.Modinfo", async () => {
+		vscode.commands.registerCommand("anno-modding-translator.Modinfo", async (uri : vscode.Uri) => {
 			// ModName
 			// Description
 			// activeTextEditor.document.fileName end with modinfo.json
-			const jsonPath = vscode.window.activeTextEditor.document.fileName;
+			const jsonPath = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
 			await ModInfo(jsonPath);
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand("anno-modding-translator.Texts", async () => {
-			const xmlPath = vscode.window.activeTextEditor.document.fileName;
+		vscode.commands.registerCommand("anno-modding-translator.Texts", async (uri : vscode.Uri) => {
+			const xmlPath = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
 			await Texts(xmlPath);
 		})
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand("anno-modding-translator.getOtherLanguages", async (uri: vscode.Uri) => {
-			const xmlPath = uri.fsPath ?? vscode.window.activeTextEditor.document.fileName;
+			const xmlPath = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
 			await getOtherLanguages(xmlPath);
 		})
 	);

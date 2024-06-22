@@ -1,134 +1,203 @@
 {
-  "name": "anno-modding-translator",
-  "displayName": "anno-modding-translator",
-  "description": "translate texts.xml",
-  "version": "0.0.6",
-  "icon": "img/icon.png",
-  "publisher": "Pnski",
-  "sponsor": {
-    "url": "https://ko-fi.com/Q5Q4YAI3F"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Pnski/anno-modding-translator"
-  },
-  "engines": {
-    "vscode": "^1.90.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "main": "./out/src/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "anno-modding-translator.testingStuff",
-        "category": "testing",
-        "title": "Hello World"
-      },
-      {
-        "command": "anno-modding-translator.Modinfo",
-        "category": "AnnoTranslate",
-        "title": "Modinfo"
-      },
-      {
-        "command": "anno-modding-translator.Texts",
-        "category": "AnnoTranslate",
-        "title": "Texts"
-      },
-      {
-        "command": "anno-modding-translator.Inplace",
-        "category": "AnnoTranslate",
-        "title": "Inplace"
-      },
-      {
-        "command": "anno-modding-translator.getOtherLanguages",
-        "group": "AnnoTranslate",
-        "title": "Make Loca files from this."
-      }
-    ],
-    "keybindings": [
-      {
-        "command": "anno-modding-translator.Modinfo",
-        "key": "ctrl+alt+t",
-        "mac": "shift+cmd+t"
-      },
-      {
-        "command": "anno-modding-translator.Texts",
-        "key": "ctrl+alt+z",
-        "mac": "shift+cmd+z"
-      },
-      {
-        "command": "anno-modding-translator.Inplace",
-        "key": "ctrl+alt+y",
-        "mac": "shift+cmd+y"
-      }
-    ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "anno-modding-translator.testingStuff",
-          "when": "true"
-        },
-        {
-          "command": "anno-modding-translator.Modinfo",
-          "when": "resourceFilename =~ /modinfo.json$/"
-        },
-        {
-          "command": "anno-modding-translator.Texts",
-          "when": "resourceFilename =~ /texts_.+xml$/"
-        },
-        {
-          "command": "anno-modding-translator.Inplace",
-          "when": "false"
-        },
-        {
-          "command": "anno-modding-translator.getOtherLanguages",
-          "when": "false"
-        }
-      ],
-      "explorer/context": [
-        {
-          "command": "anno-modding-translator.getOtherLanguages",
-          "when": "false",
-          "group": "AnnoTranslate"
-        },
-        {
-          "command": "anno-modding-translator.Modinfo",
-          "when": "resourceFilename =~ /modinfo.json$/",
-          "group": "AnnoTranslate"
-        },
-        {
-          "command": "anno-modding-translator.Texts",
-          "when": "resourceFilename =~ /texts_.+xml$/",
-          "group": "AnnoTranslate"
-        }
-      ]
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/node": "20.x",
-    "@types/vscode": "^1.90.0",
-    "@typescript-eslint/eslint-plugin": "^7.11.0",
-    "@typescript-eslint/parser": "^7.11.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "bing-translate-api": "^4.0.2",
-    "fast-xml-parser": "^4.4.0",
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7"
-  }
+	"name": "anno-modding-translator",
+	"displayName": "anno-modding-translator",
+	"description": "translate texts.xml",
+	"version": "0.0.6",
+	"icon": "img/icon.png",
+	"publisher": "Pnski",
+	"sponsor": {
+		"url": "https://ko-fi.com/Q5Q4YAI3F"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Pnski/anno-modding-translator"
+	},
+	"engines": {
+		"vscode": "^1.90.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./out/src/extension.js",
+	"contributes": {
+		"configuration": {
+			"title": "Anno Translation Tool",
+			"properties": {
+				"anno-modding-translator.defaultLang": {
+					"type": "string",
+					"default": "en",
+					"description": "Default Language",
+					"enum": [
+						"zh-Hans",
+						"zh-Hant",
+						"en",
+						"fr",
+						"de",
+						"it",
+						"ja",
+						"ko",
+						"pl",
+						"ru",
+						"es"
+					],
+					"enumItemLabels": [
+						"Chinese",
+						"Taiwanese",
+						"English",
+						"French",
+						"German",
+						"Italian",
+						"Japanese",
+						"Korean",
+						"Polish",
+						"Russian",
+						"Spanish"
+					],
+					"enumDescriptions": [
+						"中文",
+						"臺灣的",
+						"English",
+						"Français",
+						"Deutsch",
+						"Italiano",
+						"日本語",
+						"한국어",
+						"Polski",
+						"Русский",
+						"Español"
+					],
+					"markdownDescription": "Default language for inline translation."
+				},
+				"anno-modding-translator.defaultComment.enable": {
+					"title": "Enables Comments",
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "If checked, a default comment to every translated <Text> will be added."
+				},
+				"anno-modding-translator.defaultComment.text": {
+					"title": "Comments Text",
+					"type": "string",
+					"editPresentation": "singlelineText",
+					"default": "MachineTranslated by Nyk",
+					"markdownDescription": "If comments are enabled this text will be added in <!-- -->."
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "anno-modding-translator.testingStuff",
+				"category": "testing",
+				"title": "Hello World"
+			},
+			{
+				"command": "anno-modding-translator.Modinfo",
+				"category": "AnnoTranslate",
+				"title": "Modinfo"
+			},
+			{
+				"command": "anno-modding-translator.Texts",
+				"category": "AnnoTranslate",
+				"title": "Texts"
+			},
+			{
+				"command": "anno-modding-translator.Inplace",
+				"category": "AnnoTranslate",
+				"title": "Inplace"
+			},
+			{
+				"command": "anno-modding-translator.getOtherLanguages",
+				"group": "AnnoTranslate",
+				"title": "Make Loca files from this."
+			}
+		],
+		"keybindings": [
+			{
+				"command": "anno-modding-translator.Modinfo",
+				"key": "ctrl+alt+t",
+				"mac": "shift+cmd+t"
+			},
+			{
+				"command": "anno-modding-translator.Texts",
+				"key": "ctrl+alt+z",
+				"mac": "shift+cmd+z"
+			},
+			{
+				"command": "anno-modding-translator.Inplace",
+				"key": "ctrl+alt+y",
+				"mac": "shift+cmd+y"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "anno-modding-translator.testingStuff",
+					"when": "true"
+				},
+				{
+					"command": "anno-modding-translator.Modinfo",
+					"when": "resourceFilename =~ /modinfo.json$/"
+				},
+				{
+					"command": "anno-modding-translator.Texts",
+					"when": "resourceFilename =~ /texts_.+xml$/"
+				},
+				{
+					"command": "anno-modding-translator.Inplace",
+					"when": "false"
+				},
+				{
+					"command": "anno-modding-translator.getOtherLanguages",
+					"when": "false"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "anno-modding-translator.testingStuff",
+					"when": "true",
+					"group": "AnnoTranslate"
+				},
+				{
+					"command": "anno-modding-translator.getOtherLanguages",
+					"when": "false",
+					"group": "AnnoTranslate"
+				},
+				{
+					"command": "anno-modding-translator.Modinfo",
+					"when": "resourceFilename =~ /modinfo.json$/",
+					"group": "AnnoTranslate"
+				},
+				{
+					"command": "anno-modding-translator.Texts",
+					"when": "resourceFilename =~ /texts_.+xml$/",
+					"group": "AnnoTranslate"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "vscode-test"
+	},
+	"devDependencies": {
+		"@types/node": "20.x",
+		"@types/vscode": "^1.90.0",
+		"@typescript-eslint/eslint-plugin": "^7.11.0",
+		"@typescript-eslint/parser": "^7.11.0",
+		"eslint": "^8.57.0",
+		"typescript": "^5.4.5"
+	},
+	"dependencies": {
+		"bing-translate-api": "^4.0.2",
+		"fast-xml-parser": "^4.4.0",
+		"fs": "^0.0.1-security",
+		"glob": "^10.4.2",
+		"path": "^0.12.7"
+	}
 }

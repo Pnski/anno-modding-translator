@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import * as hTrans from "./Translation";
-import { Http2ServerRequest } from "http2";
 
 async function tText(Text: any, loca: string): Promise<string> {
 	if (typeof Text == "string") {
@@ -68,21 +67,7 @@ async function tMText(Text: any, loca: string[]): Promise<{ [key: string]: strin
 }
 
 export async function gMModOps(ModOp: any, loca: string[]): Promise<any> {
-	if (typeof ModOp == "undefined") {
-		vscode.window.showWarningMessage("Error ModOp not found in ModOps!");
-	} else {
-		var _ModOp: { [key: string]: any } = {};
-		loca.forEach(lang => _ModOp[lang] = ModOp);
-		//ModOp original language - translate to all languages from diffLang
-		//returns ModOp[difflang] array
-		let _get : { [key: string]: string } = {};//error_get.push(hTrans.getTranslations(element.Text,loca)
-		//ModOp.ModOp.forEach(element => (true));
-		for (let items of ModOp.ModOp){
-			var i = await hTrans.getTranslations(items.Text,loca);
-			for (const l in i){
-				_get[l] = i[l];
-			}
-		}
-		console.log("get",_get);
-	}
+	// Array to hold translation results
+    const translatedTexts = [];
+	//const translations = await MET.translate(parsedXML, null, languageCode);
 }

@@ -1,7 +1,26 @@
 import * as vscode from "vscode";
 import { writeFile, readFile, writeFileSync, readFileSync, readdirSync } from "node:fs";
 import * as path from "path";
-import { XMLParser, XMLBuilder, XMLValidator } from "fast-xml-parser";
+import { XMLParser, XMLBuilder } from "fast-xml-parser";
+
+// Define XML parser options for fast-xml-parser
+const parserOptions = {
+	attributeNamePrefix: "@@",
+	ignoreAttributes: false,
+	allowBooleanAttributes: true,
+	parseNodeValue: true,
+	parseAttributeValue: false,
+	trimValues: true,
+	parseTrueNumberOnly: false,
+	arrayMode: false,
+	commentPropName: "#comment",
+	format:true
+  };
+
+  /* ignoreAttributes: false,
+		attributeNamePrefix: "@@",
+		format: true,
+		commentPropName: "#comment" */
 
 /* read files */
 export async function readJson(filePath: string): Promise<any> {
@@ -15,14 +34,7 @@ export async function readJson(filePath: string): Promise<any> {
 }
 
 export async function readXML(filePath: string): Promise<any> {
-	/* options for XMLParser */
-	const options = {
-		ignoreAttributes: false,
-		attributeNamePrefix: "@@",
-		format: true,
-		commentPropName: "#comment"
-	};
-	const parser = new XMLParser(options);
+	const parser = new XMLParser(parserOptions);
 	if (filePath.endsWith(".xml")) {
 		const loadedXML = await readFileSync(filePath, "utf-8");
 		let parsedXML = parser.parse(loadedXML);
@@ -43,16 +55,9 @@ export async function writeJSON(filePath: string, pJson: any): Promise<void> {
 }
 
 export async function writeXML(filePath: string, pXML: any): Promise<boolean> {
-	const options = {
-		ignoreAttributes: false,
-		attributeNamePrefix: "@@",
-		format: true,
-		commentPropName: "#comment"
-	};
-
-	const builder = new XMLBuilder(options);
+	const builder = new XMLBuilder(parserOptions);
 	const xmlOutput = builder.build(pXML).replaceAll("&apos;", "'").replaceAll("&quot;", '"');
-	await writeFileSync(filePath, xmlOutput);
+	writeFileSync(filePath, xmlOutput);
 	return true;
 }
 

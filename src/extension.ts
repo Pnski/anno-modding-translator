@@ -8,49 +8,11 @@ fast-xml-parser RW XML <> json <> objects
 json = buildin
 */
 import * as vscode from "vscode";
-//@ts-ignore
 import * as hModOp from "./Scripts/ModOp";
-//@ts-ignore
 import * as hFiles from "./Scripts/Files";
-//@ts-ignore
 import * as hTrans from "./Scripts/Translation";
 import * as hHelper from "./Scripts/Helper";
-
-/* Global constant declaration 
-aLn - Array with name, short [filename is always 'texts_+name+.xml'] no need to save
-*/
-/* for (const [key, value] of Object.entries(aLn)) {
-		console.log(`${key}: ${value}`);
-	} */
-const aLn: { [key: string]: string } = {
-	chinese: "zh-Hans",
-	taiwanese: "zh-Hant",
-	english: "en",
-	french: "fr",
-	german: "de",
-	italian: "it",
-	japanese: "ja",
-	korean: "ko",
-	polish: "pl",
-	russian: "ru",
-	spanish: "es"
-};
-
-//<Text>Euer &lt;font color='#ff80ffff'&gt;&lt;b&gt;[AssetData(1500001173) Text]&lt;/b&gt;&lt;/font&gt; hat erfolgreich &lt;img height='24' width='24' src="[AssetData(1010017) Icon]"/&gt; &lt;font overrideTextColor="true" color='#ff0000ff'&gt;&lt;b&gt;[AssetData(1010017) Text]&lt;/b&gt;&lt;/font&gt; gestohlen.</Text>
-/* litString = text between <Text> AND </Text> */
-//Euer &lt;font color='#ff80ffff'&gt;&lt;b&gt;[AssetData(1500001173) Text]&lt;/b&gt;&lt;/font&gt; hat erfolgreich &lt;img height='24' width='24' src="[AssetData(1010017) Icon]"/&gt; &lt;font overrideTextColor="true" color='#ff0000ff'&gt;&lt;b&gt;[AssetData(1010017) Text]&lt;/b&gt;&lt;/font&gt; gestohlen.
-function cleanStrings(litString: string): [] {
-	const regex = new RegExp("(&gt;)(.*?)(&lt;)", "gi");
-	const nArray = [...litString.matchAll(regex)];
-	for (var i = 0; i < nArray.length; i++) {
-		console.log(nArray[i]);
-	}
-	return [];
-}
-
-async function parseTranslate(litString: string): Promise<any> {
-	return;
-}
+import aLn from './Scripts/languageMap';
 
 async function ModInfo(filePath: string): Promise<any> {
 	const pJson = await hFiles.readJson(filePath);
@@ -108,11 +70,11 @@ async function Texts(filePath: string): Promise<void> {
 
 async function getOtherLanguages(filePath: string): Promise<void> {
 	const loca = filePath.match("texts_(.*).xml")[1]; // current language
-	const pXML = await hFiles.readXML(filePath);
 	if (typeof loca !== "string") {
 		console.error("donkey");
 		return;
 	}
+	const pXML = await hFiles.readXML(filePath);
 	const diffLang = await vscode.window.showInformationMessage("Do you want to recreate ALL other languages extept for ${loca}?", "Yes", "No").then(answer => {
 		if (answer === "Yes")
 			// delete all other files first than get diff
@@ -120,8 +82,8 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 		else 
 			return (hHelper.getALanguages(filePath, aLn)[1]);
 	});
-	let _pXML = await hModOp.gMModOps(pXML.ModOps,diffLang);
-	console.log("_pxmlout",_pXML);
+	//let _pXML = await hModOp.gMModOps(pXML.ModOps,diffLang);
+	//console.log("_pxmlout",_pXML);
 	return;
 	
 	console.log(hHelper.getALanguages(filePath, aLn)); // array found languages and diff languages

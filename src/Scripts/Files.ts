@@ -1,18 +1,8 @@
 import * as vscode from "vscode";
-import { writeFile, readFile, writeFileSync, readFileSync, readdirSync } from "node:fs";
-import * as path from "path";
+import { writeFile, writeFileSync, readFileSync, readdirSync } from "node:fs";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import { translate } from "bing-translate-api";
-import { getTranslation } from "./Translation";
 
-// Define XML parser options for fast-xml-parser
-
-/* ignoreAttributes: false,
-		attributeNamePrefix: "@@",
-		format: true,
-		commentPropName: "#comment" */
-
-/* read files */
 export async function readJson(filePath: string): Promise<any> {
 	if (filePath.endsWith(".json")) {
 		const loadedJSON = await readFileSync(filePath, "utf-8");

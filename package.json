@@ -100,7 +100,7 @@
 			{
 				"command": "anno-modding-translator.Texts",
 				"category": "AnnoTranslate",
-				"title": "Texts"
+				"title": "Autotranslate: This"
 			},
 			{
 				"command": "anno-modding-translator.Inplace",
@@ -110,7 +110,7 @@
 			{
 				"command": "anno-modding-translator.getOtherLanguages",
 				"group": "AnnoTranslate",
-				"title": "Make Loca files from this."
+				"title": "Autotranslate: from This"
 			}
 		],
 		"keybindings": [
@@ -200,7 +200,6 @@
 		"fast-xml-parser": "^4.4.0",
 		"fs": "^0.0.1-security",
 		"google-translate-api": "^2.3.0",
-		"path": "^0.12.7",
-		"xml2js": "^0.6.2"
+		"path": "^0.12.7"
 	}
 }

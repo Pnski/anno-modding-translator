@@ -75,6 +75,7 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 		return;
 	}
 	const pXML = await hFiles.readXML(filePath);
+	
 	const diffLang = await vscode.window.showInformationMessage("Do you want to recreate ALL other languages extept for ${loca}?", "Yes", "No").then(answer => {
 		if (answer === "Yes")
 			// delete all other files first than get diff
@@ -82,8 +83,8 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 		else 
 			return (hHelper.getALanguages(filePath, aLn)[1]);
 	});
-	//let _pXML = await hModOp.gMModOps(pXML.ModOps,diffLang);
-	//console.log("_pxmlout",_pXML);
+	console.log(await hModOp._gModOps(pXML,diffLang.map(_short => aLn[_short])));
+
 	return;
 	
 	console.log(hHelper.getALanguages(filePath, aLn)); // array found languages and diff languages

@@ -12,8 +12,7 @@ import * as hModOp from "./Scripts/ModOp";
 import * as hFiles from "./Scripts/Files";
 import * as hTrans from "./Scripts/Translation";
 import * as hHelper from "./Scripts/Helper";
-import aLn from './Scripts/languageMap';
-import { allowedNodeEnvironmentFlags } from "process";
+import aLn from "./Scripts/languageMap";
 
 async function ModInfo(filePath: string): Promise<any> {
 	const pJson = await hFiles.readJson(filePath);
@@ -70,29 +69,23 @@ async function Texts(filePath: string): Promise<void> {
 }
 
 async function getOtherLanguages(filePath: string): Promise<void> {
+	let _get: any;
 	const loca = filePath.match("texts_(.*).xml")[1]; // current language
 	if (typeof loca !== "string") {
 		console.error("donkey");
 		return;
 	}
 	const pXML = await hFiles.readXML(filePath);
-	
-	const diffLang = await vscode.window.showInformationMessage("Do you want to recreate ALL other languages extept for ${loca}?", "Yes", "No").then(answer => {
-		if (answer === "Yes")
-			// delete all other files first than get diff
-			return (hHelper.getMLanguages([loca], hHelper.getCLanguages(aLn)));
-		else 
-			return (hHelper.getALanguages(filePath, aLn)[1]);
-	});
-	const _get = await hModOp._gModOps(pXML,diffLang.map(_short => aLn[_short]));
-	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
-    diffLang.forEach((_lang) =>{
-		hFiles.writeXML(filePath.substring(0, filePath.lastIndexOf("\\") + 1)+'texts_'+_lang+'.xml',_get[aLn[_lang]])
-	})
-	return;
-	
-	console.log(hHelper.getALanguages(filePath, aLn)); // array found languages and diff languages
-	
+
+	const diffLang = await vscode.window
+		.showInformationMessage("Do you want to recreate ALL other languages extept for " + loca + " ?", "Yes", "No")
+		.then(answer => {
+			if (answer === "Yes")
+				// delete all other files first than get diff
+				return hHelper.getMLanguages([loca], hHelper.getCLanguages(aLn));
+			else return hHelper.getALanguages(filePath, aLn)[1];
+		});
+	let config = vscode.workspace.getConfiguration("anno-modding-translator.defaultComment");
 	await vscode.window.withProgress(
 		{
 			location: vscode.ProgressLocation.Notification,
@@ -100,9 +93,30 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 			cancellable: false
 		},
 		async (progress, token) => {
-			//pXML.ModOps.ModOp = await hModOp.gMModOps(pXML.ModOps.ModOp, diffLang);
+			if (config.enable) {
+				console.log("with comments", typeof config.text);
+				_get = await hModOp._gModOps(
+					pXML,
+					diffLang.map(_short => aLn[_short]),
+					config.text
+				);
+			} else {
+				console.log("without comments");
+				_get = await hModOp._gModOps(
+					pXML,
+					diffLang.map(_short => aLn[_short])
+				);
+			}
 		}
 	);
+	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
+	diffLang.forEach(_lang => {
+		hFiles.writeXML(filePath.substring(0, filePath.lastIndexOf("\\") + 1) + "texts_" + _lang + ".xml", _get[aLn[_lang]]);
+	});
+	return;
+
+	console.log(hHelper.getALanguages(filePath, aLn)); // array found languages and diff languages
+
 	//vscode.window.showWarningMessage("Translation complete, attempting to write file.");
 	//await hFiles.writeXML(filePath, pXML);
 }
@@ -111,17 +125,10 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "anno-modding-translator" is now active!');
 	context.subscriptions.push(
 		vscode.commands.registerCommand("anno-modding-translator.testingStuff", async (uri: vscode.Uri) => {
-			/* 	for (let [key, value] of Object.entries(aLn)) {
-				console.log(typeof key, typeof value);
-			}
-			const str : string =  "Chinese";
-		uri.path
-		console.log(aLn[str.toLowerCase()])
-		console.log("hello world"); */
 			var path = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
 			//console.log(hFiles.readDir(path));
-			const _t = await hTrans.getTranslations("deine mutter mag luftschiffe!", hHelper.getALanguages(path, aLn)[1]);
-			console.error(_t);
+			console.log(await hFiles.readXML(path));
+			//console.log((config.enable)? config.text:null)
 		})
 	);
 	context.subscriptions.push(

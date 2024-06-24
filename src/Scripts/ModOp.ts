@@ -115,6 +115,7 @@ export async function getMultipleResults(XML: any, loca: string[]): Promise<any>
 
 interface ModOp {
 	Text: string | Array<any>;
+	comment: string[];
 	[key: string]: any;
 }
 
@@ -125,7 +126,7 @@ interface ModOpsContainer {
 	[key: string]: any;
 }
 
-export async function _gModOps(pXML: ModOpsContainer, loca: string[]): Promise<any> {
+export async function _gModOps(pXML: ModOpsContainer, loca: string[], optComm?: string): Promise<any> {
 	let _pXML: { [key: string]: ModOpsContainer } = {};
 	loca.forEach(el => (_pXML[el] = structuredClone(pXML)));
 	if (Array.isArray(pXML.ModOps)) {
@@ -137,11 +138,21 @@ export async function _gModOps(pXML: ModOpsContainer, loca: string[]): Promise<a
 					case "string": {
 						console.log("Translating: " + value.Text.substring(0, 20));
 						if (value.Text.length == 0) {
-							console.error("Empty Text detected skipping!")
+							console.error("Empty Text detected skipping!");
 						} else {
-							let _get = await MET.translate(value.Text, null, loca);
+							let _get = await MET.translate(value.Text, null, loca, {
+								translateOptions: {
+									textType: "html" as unknown as object
+								}
+							});
 							for (var i = 0; i < _get[0].translations.length; i++) {
-								_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text = _get[0].translations[i].text;
+								if (typeof _pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment == 'undefined') {
+									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment = [];
+								}
+								if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text != _get[0].translations[i].text) {
+									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text = _get[0].translations[i].text;
+									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment.push(optComm);
+								}
 							}
 						}
 						break;
@@ -150,14 +161,25 @@ export async function _gModOps(pXML: ModOpsContainer, loca: string[]): Promise<a
 						for (let _TextIndex in value.Text) {
 							console.log("Translating: " + value.Text[_TextIndex].Text.substring(0, 20));
 							if (value.Text[_TextIndex].Text.length == 0) {
-								console.error("Empty Text detected skipping!")
+								console.error("Empty Text detected skipping!");
 							} else {
-								let _get = await MET.translate(value.Text[_TextIndex].Text, null, loca);
+								let _get = await MET.translate(value.Text[_TextIndex].Text, null, loca, {
+									translateOptions: {
+										// Explicitly set textType as `html`. Defaults to `plain`.
+										textType: "html" as unknown as object
+									}
+								});
 								for (var i = 0; i < _get[0].translations.length; i++) {
-									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
+									if (typeof _pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment == 'undefined') {
+										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment = [];
+									}
+									console.log("testing no comment",_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment);
+									if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text != _get[0].translations[i].text) {
+										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
+										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment.push(optComm);
+									}
 								}
 							}
-							
 						}
 						break;
 					}

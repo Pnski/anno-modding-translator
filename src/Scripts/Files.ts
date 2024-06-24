@@ -7,7 +7,6 @@ import { getTranslation } from "./Translation";
 
 // Define XML parser options for fast-xml-parser
 
-
 /* ignoreAttributes: false,
 		attributeNamePrefix: "@@",
 		format: true,
@@ -24,22 +23,30 @@ export async function readJson(filePath: string): Promise<any> {
 	}
 }
 
-async function myTagFunction(key: string, val:string, jpath:string) :Promise<string> {
-	console.log("mytag",key,val,jpath)
-	let _get = await translate(val,null,'ja');
-	console.log(_get.translation)
-	return _get.translation
+async function myTagFunction(key: string, val: string, jpath: string): Promise<string> {
+	console.log("mytag", key, val, jpath);
+	let _get = await translate(val, null, "ja");
+	console.log(_get.translation);
+	return _get.translation;
 }
 
 export async function readXML(filePath: string): Promise<any> {
 	const parserOptions = {
 		attributeNamePrefix: "@@",
 		ignoreAttributes: false,
-		commentPropName: "#comment",
+		commentPropName: "comment",
 		format: true,
-		isArray: ( tagName: string) => {
-			if (tagName == 'ModOp') return true;
-		  }
+		isArray: (tagName: string) => {
+			if (tagName == "ModOp") return true;
+			if (tagName == "comment") return true;
+		},
+		tagValueProcessor: (tagName: string, tagValue: string) => {
+			if (tagName == "Text") {
+				var str = tagValue.replaceAll(/\[(.*?)\](?!\))/gi, "<div class='notranslate'>$1</div>");
+				return str;
+			}
+			return tagValue;
+		}
 	};
 	const parser = new XMLParser(parserOptions);
 	if (filePath.endsWith(".xml")) {
@@ -65,12 +72,16 @@ export async function writeXML(filePath: string, pXML: any): Promise<boolean> {
 	const parserOptions = {
 		attributeNamePrefix: "@@",
 		ignoreAttributes: false,
-		commentPropName: "#comment",
-		format: true,
-		
-		}
+		commentPropName: "comment",
+		format: true
+	};
 	const builder = new XMLBuilder(parserOptions);
-	const xmlOutput = builder.build(pXML).replaceAll("&apos;", "'").replaceAll("&quot;", '"');
+	const xmlOutput = builder
+		.build(pXML)
+		.replaceAll("&apos;", "'")
+		.replaceAll("&quot;", '"')
+		.replaceAll("&lt;div class='notranslate'&gt;", "[")
+		.replaceAll("&lt;/div&gt;", "]");
 	writeFileSync(filePath, xmlOutput);
 	return true;
 }

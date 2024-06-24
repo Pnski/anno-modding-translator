@@ -23,7 +23,7 @@ const builderOptions = {
   commentPropName: "#comment"
 }; */
 
-async function tText(Text: any, loca: string): Promise<string> {
+/* async function tText(Text: any, loca: string): Promise<string> {
 	if (typeof Text == "string") {
 		return await hTrans.getTranslation(Text, loca);
 	} else {
@@ -91,10 +91,10 @@ export async function getMultipleResults(XML: any, loca: string[]): Promise<any>
 	  // Map translations back to ModOps
 	  textsToTranslate.forEach((item, index) => {
 		item.Text = translatedTexts[index].translatedText;
-	  }); */
+	  });
 }
 
-/* const totalValues = (nestedObjects: NestedObject[]) => {
+const totalValues = (nestedObjects: NestedObject[]) => {
   return nestedObjects.reduce(
     (totalValue, nestedObject: NestedObject): number => {
       // Add the current object's value

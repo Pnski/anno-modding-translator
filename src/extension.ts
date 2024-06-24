@@ -48,7 +48,32 @@ async function ModInfo(filePath: string): Promise<any> {
 }
 
 async function Texts(filePath: string): Promise<void> {
-	var pXML = await hFiles.readXML(filePath);
+	let _get: any;
+	const loca = filePath.match("texts_(.*).xml")[1]; // current language
+	if (typeof loca !== "string") {
+		console.error("donkey");
+		return;
+	}
+	const pXML = await hFiles.readXML(filePath);
+
+	let config = vscode.workspace.getConfiguration("anno-modding-translator.defaultComment");
+	await vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: "Translation in progress...",
+			cancellable: false
+		},
+		async (progress, token) => {
+			if (config.enable) {
+				_get = await hModOp._gModOps(pXML,[aLn[loca.toLowerCase()]],config.text);
+			} else {
+				_get = await hModOp._gModOps(pXML,[aLn[loca.toLowerCase()]]);
+			}
+		}
+	);
+	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
+	hFiles.writeXML(filePath,  _get[aLn[loca]]);
+	/* var pXML = await hFiles.readXML(filePath);
 	const loca = filePath.match("texts_(.*).xml")[1];
 	if (typeof loca !== "string") {
 		console.error("donkey");
@@ -65,7 +90,7 @@ async function Texts(filePath: string): Promise<void> {
 		}
 	);
 	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
-	await hFiles.writeXML(filePath, pXML);
+	await hFiles.writeXML(filePath, pXML); */
 }
 
 async function getOtherLanguages(filePath: string): Promise<void> {
@@ -111,12 +136,6 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 	diffLang.forEach(_lang => {
 		hFiles.writeXML(filePath.substring(0, filePath.lastIndexOf("\\") + 1) + "texts_" + _lang + ".xml", _get[aLn[_lang]]);
 	});
-	return;
-
-	console.log(hHelper.getALanguages(filePath, aLn)); // array found languages and diff languages
-
-	//vscode.window.showWarningMessage("Translation complete, attempting to write file.");
-	//await hFiles.writeXML(filePath, pXML);
 }
 
 export function activate(context: vscode.ExtensionContext) {

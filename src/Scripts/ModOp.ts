@@ -113,47 +113,51 @@ export async function getMultipleResults(XML: any, loca: string[]): Promise<any>
 };
  */
 
-
 interface ModOp {
-    Text: string | Array<any>;
-    [key: string]: any; // Allow for other properties
+	Text: string | Array<any>;
+	[key: string]: any;
 }
 
 interface ModOpsContainer {
-    ModOps: {
-        ModOp: ModOp[];
-    };
-    [key: string]: any; // Allow for other properties
+	ModOps: {
+		ModOp: ModOp[];
+	};
+	[key: string]: any;
 }
 
 export async function _gModOps(pXML: ModOpsContainer, loca: string[]): Promise<any> {
-	console.log("starting");
-	//let _pXML = new WeakMap()
 	let _pXML: { [key: string]: ModOpsContainer } = {};
 	loca.forEach(el => (_pXML[el] = structuredClone(pXML)));
 	if (Array.isArray(pXML.ModOps)) {
 		return "";
 	} else {
-		console.log("pXML", pXML.ModOps);
 		if (Array.isArray(pXML.ModOps.ModOp)) {
 			for (let [key, value] of Object.entries(pXML.ModOps.ModOp)) {
 				switch (typeof value.Text) {
 					case "string": {
-						console.log("Translating: "+value.Text)
-						let _get = await MET.translate(value.Text, null, loca);
-						// only one string translated alway [0]
-						for (var i = 0; i < _get[0].translations.length; i++) {
-							_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text = _get[0].translations[i].text;
+						console.log("Translating: " + value.Text.substring(0, 20));
+						if (value.Text.length == 0) {
+							console.error("Empty Text detected skipping!")
+						} else {
+							let _get = await MET.translate(value.Text, null, loca);
+							for (var i = 0; i < _get[0].translations.length; i++) {
+								_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text = _get[0].translations[i].text;
+							}
 						}
 						break;
 					}
 					case "object": {
 						for (let _TextIndex in value.Text) {
-							console.log("Translating: "+value.Text[_TextIndex].Text)
-							let _get = await MET.translate(value.Text[_TextIndex].Text, null, loca);
-							for (var i = 0; i < _get[0].translations.length; i++) {
-								_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
+							console.log("Translating: " + value.Text[_TextIndex].Text.substring(0, 20));
+							if (value.Text[_TextIndex].Text.length == 0) {
+								console.error("Empty Text detected skipping!")
+							} else {
+								let _get = await MET.translate(value.Text[_TextIndex].Text, null, loca);
+								for (var i = 0; i < _get[0].translations.length; i++) {
+									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
+								}
 							}
+							
 						}
 						break;
 					}
@@ -163,8 +167,8 @@ export async function _gModOps(pXML: ModOpsContainer, loca: string[]): Promise<a
 				}
 			}
 		} else {
+			console.error("no array");
 		}
 	}
-	console.warn("new pxml last line",_pXML)
 	return _pXML;
 }

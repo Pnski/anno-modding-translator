@@ -32,13 +32,14 @@ async function myTagFunction(key: string, val:string, jpath:string) :Promise<str
 }
 
 export async function readXML(filePath: string): Promise<any> {
-	const a1:string[] = []
-	var i = 0;
 	const parserOptions = {
 		attributeNamePrefix: "@@",
 		ignoreAttributes: false,
 		commentPropName: "#comment",
-		format: true
+		format: true,
+		isArray: ( tagName: string) => {
+			if (tagName == 'ModOp') return true;
+		  }
 	};
 	const parser = new XMLParser(parserOptions);
 	if (filePath.endsWith(".xml")) {
@@ -65,7 +66,8 @@ export async function writeXML(filePath: string, pXML: any): Promise<boolean> {
 		attributeNamePrefix: "@@",
 		ignoreAttributes: false,
 		commentPropName: "#comment",
-		format: true
+		format: true,
+		
 		}
 	const builder = new XMLBuilder(parserOptions);
 	const xmlOutput = builder.build(pXML).replaceAll("&apos;", "'").replaceAll("&quot;", '"');

@@ -13,6 +13,7 @@ import * as hFiles from "./Scripts/Files";
 import * as hTrans from "./Scripts/Translation";
 import * as hHelper from "./Scripts/Helper";
 import aLn from './Scripts/languageMap';
+import { allowedNodeEnvironmentFlags } from "process";
 
 async function ModInfo(filePath: string): Promise<any> {
 	const pJson = await hFiles.readJson(filePath);
@@ -83,8 +84,11 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 		else 
 			return (hHelper.getALanguages(filePath, aLn)[1]);
 	});
-	console.log(await hModOp._gModOps(pXML,diffLang.map(_short => aLn[_short])));
-
+	const _get = await hModOp._gModOps(pXML,diffLang.map(_short => aLn[_short]));
+	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
+    diffLang.forEach((_lang) =>{
+		hFiles.writeXML(filePath.substring(0, filePath.lastIndexOf("\\") + 1)+'texts_'+_lang+'.xml',_get[aLn[_lang]])
+	})
 	return;
 	
 	console.log(hHelper.getALanguages(filePath, aLn)); // array found languages and diff languages

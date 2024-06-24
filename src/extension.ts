@@ -94,14 +94,12 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 		},
 		async (progress, token) => {
 			if (config.enable) {
-				console.log("with comments", typeof config.text);
 				_get = await hModOp._gModOps(
 					pXML,
 					diffLang.map(_short => aLn[_short]),
 					config.text
 				);
 			} else {
-				console.log("without comments");
 				_get = await hModOp._gModOps(
 					pXML,
 					diffLang.map(_short => aLn[_short])

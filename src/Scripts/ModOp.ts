@@ -173,7 +173,6 @@ export async function _gModOps(pXML: ModOpsContainer, loca: string[], optComm?: 
 									if (typeof _pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment == 'undefined') {
 										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment = [];
 									}
-									console.log("testing no comment",_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment);
 									if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text != _get[0].translations[i].text) {
 										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
 										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment.push(optComm);

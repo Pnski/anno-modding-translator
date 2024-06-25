@@ -14,6 +14,8 @@ import * as hTrans from "./Scripts/Translation";
 import * as hHelper from "./Scripts/Helper";
 import aLn from "./Scripts/languageMap";
 
+import singleTranslate from '../lang/scripts/Libre/LibreProvider'
+
 async function ModInfo(filePath: string): Promise<any> {
 	const pJson = await hFiles.readJson(filePath);
 	// .Category .ModName .Description
@@ -64,6 +66,7 @@ async function Texts(filePath: string): Promise<void> {
 			cancellable: false
 		},
 		async (progress, token) => {
+			console.log("get here")
 			if (config.enable) {
 				_get = await hModOp._gModOps(pXML,[aLn[loca.toLowerCase()]],config.text);
 			} else {
@@ -73,24 +76,7 @@ async function Texts(filePath: string): Promise<void> {
 	);
 	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
 	hFiles.writeXML(filePath,  _get[aLn[loca]]);
-	/* var pXML = await hFiles.readXML(filePath);
-	const loca = filePath.match("texts_(.*).xml")[1];
-	if (typeof loca !== "string") {
-		console.error("donkey");
-		return;
-	}
-	await vscode.window.withProgress(
-		{
-			location: vscode.ProgressLocation.Notification,
-			title: "Translation in progress...",
-			cancellable: false
-		},
-		async (progress, token) => {
-			pXML.ModOps.ModOp = await hModOp.gModOps(pXML.ModOps.ModOp, aLn[loca.toLowerCase()]);
-		}
-	);
-	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
-	await hFiles.writeXML(filePath, pXML); */
+	
 }
 
 async function getOtherLanguages(filePath: string): Promise<void> {
@@ -118,6 +104,7 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 			cancellable: false
 		},
 		async (progress, token) => {
+			
 			if (config.enable) {
 				_get = await hModOp._gModOps(
 					pXML,
@@ -125,13 +112,16 @@ async function getOtherLanguages(filePath: string): Promise<void> {
 					config.text
 				);
 			} else {
+				console.log("get here")
 				_get = await hModOp._gModOps(
 					pXML,
 					diffLang.map(_short => aLn[_short])
 				);
+				console.log("get here2",_get)
 			}
 		}
 	);
+	console.log(_get)
 	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
 	diffLang.forEach(_lang => {
 		hFiles.writeXML(filePath.substring(0, filePath.lastIndexOf("\\") + 1) + "texts_" + _lang + ".xml", _get[aLn[_lang]]);
@@ -143,9 +133,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand("anno-modding-translator.testingStuff", async (uri: vscode.Uri) => {
 			var path = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
-			//console.log(hFiles.readDir(path));
 			console.log(await hFiles.readXML(path));
-			//console.log((config.enable)? config.text:null)
+			console.log(await singleTranslate('deine mamma lutscht schwänze','en'));			
 		})
 	);
 	context.subscriptions.push(

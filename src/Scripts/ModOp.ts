@@ -15,12 +15,15 @@ interface ModOpsContainer {
 
 export async function _gModOps(pXML: ModOpsContainer, loca: string[], optComm?: string): Promise<any> {
 	let _pXML: { [key: string]: ModOpsContainer } = {};
+	console.log(_pXML,pXML.ModOps)
 	loca.forEach(el => (_pXML[el] = structuredClone(pXML)));
 	if (Array.isArray(pXML.ModOps)) {
+		
 		return "";
 	} else {
 		if (Array.isArray(pXML.ModOps.ModOp)) {
 			for (let [key, value] of Object.entries(pXML.ModOps.ModOp)) {
+				console.log("error",key,value.Text)
 				switch (typeof value.Text) {
 					case "string": {
 						console.log("Translating: " + value.Text.substring(0, 20));
@@ -45,7 +48,9 @@ export async function _gModOps(pXML: ModOpsContainer, loca: string[], optComm?: 
 						break;
 					}
 					case "object": {
+						value.Text = Array.isArray(value.Text)?value.Text:[value.Text]
 						for (let _TextIndex in value.Text) {
+							console.error("object",value.Text[_TextIndex].Text)
 							console.log("Translating: " + value.Text[_TextIndex].Text.substring(0, 20));
 							if (value.Text[_TextIndex].Text.length == 0) {
 								console.error("Empty Text detected skipping!");

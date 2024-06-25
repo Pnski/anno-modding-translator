@@ -26,7 +26,7 @@ export async function readXML(filePath: string): Promise<any> {
 		ignoreAttributes: false,
 		commentPropName: "comment",
 		format: true,
-		isArray: (tagName: string, jpath, isLeafNode, isAttribute) => {
+		isArray: (tagName: string, jpath: string, isLeafNode :boolean) => {
 			if (tagName == "ModOp") return true;
 			if (tagName == "comment") return true;
 			if (tagName == "Text" && isLeafNode == false) return true;

@@ -2,7 +2,7 @@
 	"name": "anno-modding-translator",
 	"displayName": "anno-modding-translator",
 	"description": "translate texts.xml",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"icon": "img/icon.png",
 	"publisher": "Pnski",
 	"sponsor": {
@@ -70,6 +70,12 @@
 						"Español"
 					],
 					"markdownDescription": "Default language for inline translation."
+				},
+				"anno-modding-translator.defaultComment.sourceString": {
+					"title": "Comments with SourceString",
+					"type":"boolean",
+					"default":false,
+					"markdownDescription": "Enables that text that gets translated gets the sourcestring with the autodetection language <!-- Source EN: my english flyff text -->."
 				},
 				"anno-modding-translator.defaultComment.enable": {
 					"title": "Enables Comments",

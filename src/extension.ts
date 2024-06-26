@@ -7,6 +7,9 @@ fast-xml-parser RW XML <> json <> objects
 
 json = buildin
 */
+
+
+
 import * as vscode from "vscode";
 import * as hModOp from "./Scripts/ModOp";
 import * as hFiles from "./Scripts/Files";
@@ -14,7 +17,7 @@ import * as hTrans from "./Scripts/Translation";
 import * as hHelper from "./Scripts/Helper";
 import aLn from "./Scripts/languageMap";
 
-import singleTranslate from '../lang/scripts/Libre/LibreProvider'
+import * as libretranslate from '../lang/scripts/Libre/LibreProvider'
 
 async function ModInfo(filePath: string): Promise<any> {
 	const pJson = await hFiles.readJson(filePath);
@@ -133,8 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand("anno-modding-translator.testingStuff", async (uri: vscode.Uri) => {
 			var path = (uri ?? vscode.window.activeTextEditor.document.uri).fsPath;
-			console.log(await hFiles.readXML(path));
-			console.log(await singleTranslate('deine mamma lutscht schwänze','en'));			
+			console.log("libre",await libretranslate.singleTranslate('deine mamma lutscht schwänze','en'));
 		})
 	);
 	context.subscriptions.push(

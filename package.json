@@ -26,7 +26,7 @@
 		"configuration": {
 			"title": "Anno Translation Tool",
 			"properties": {
-				"amt.defaultLang": {
+				"amt.Translation.Lang": {
 					"type": "string",
 					"default": "en",
 					"description": "Default Language",
@@ -71,24 +71,41 @@
 					],
 					"markdownDescription": "Default language for inline translation."
 				},
-				"amt.defaultComment.sourceString": {
+				"amt.Comment.sourceString": {
 					"title": "Comments with SourceString",
-					"type":"boolean",
-					"default":false,
+					"type": "boolean",
+					"default": false,
 					"markdownDescription": "Enables that text that gets translated gets the sourcestring with the autodetection language <!-- Source EN: my english flyff text -->."
 				},
-				"amt.defaultComment.enable": {
+				"amt.Comment.enable": {
 					"title": "Enables Comments",
 					"type": "boolean",
 					"default": false,
 					"markdownDescription": "If checked, a default comment to every translated <Text> will be added."
 				},
-				"amt.defaultComment.text": {
+				"amt.Comment.text": {
 					"title": "Comments Text",
 					"type": "string",
 					"editPresentation": "singlelineText",
 					"default": "MachineTranslated by Nyk",
 					"markdownDescription": "If comments are enabled this text will be added in <!-- -->."
+				},
+				"amt.Translation.Provider": {
+					"title": "Comments Text",
+					"type": "string",
+					"description": "Default translation provider.",
+					"enum": [
+						"BingTranslate",
+						"LibreTranslate",
+						"GoogleTranslate"
+					],
+					"enumDescriptions": [
+						"Translation with translate.bing.com",
+						"Translation with libretranslate.com",
+						"translation with translate.google.com"
+					],
+					"default": "BingTranslate",
+					"markdownDescription": "Choose a translation provider, currently none with API-Key are used. (Google not working do not use)."
 				}
 			}
 		},

@@ -1,14 +1,31 @@
+import * as vscode from "vscode";
+
 import aLn from "../config/AnnoLanguages";
 import * as libreTranslate from "./Libre/LibreProvider";
 import * as bingTranslate from "./Bing/bingProvider";
 
+import * as visual from '../../message/messageHandler'
+
+/**
+ * @{string} .Lang
+ * @{string} .Provider
+ */
+
+var config: any = vscode.workspace.getConfiguration("amt.Translation");
+
+vscode.workspace.onDidChangeConfiguration(e => {
+	if (e.affectsConfiguration("amt.Translation")) {
+		config = vscode.workspace.getConfiguration("amt.Translation");
+	}
+});
+
 interface Translation {
-    to: string;
-    text: string;
+	to: string;
+	text: string;
 }
 
 interface Response {
-    translations?: Translation[];
+	translations?: Translation[];
 }
 
 /**
@@ -23,15 +40,14 @@ interface Response {
 
 export async function singleTranslate(
 	TranslateText: string,
-	TranslateTo: string = "en",
+	TranslateTo: string = config.Lang,
 	TranslateFrom: string = "auto"
 ): Promise<string | undefined> {
 	try {
 		var res = bingTranslate.getTranslation(TranslateText, TranslateFrom, TranslateTo);
-		return (await res);
+		return await res;
 	} catch (err) {
-		/* console.error("Caught error in machinetranslation of " + TranslateText + " due to unknown reason (internet related).");
-		vscode.window.showErrorMessage("Caught error with translation of: " + TranslateText); */
+		visual.visualError(TranslateText);
 		return TranslateText;
 	}
 }
@@ -48,19 +64,17 @@ export async function singleTranslate(
 
 export async function multiTranslate(
 	TranslateText: string,
-	TranslateTo: string[] = ["en"],
+	TranslateTo: string[] = [config.Lang],
 	TranslateFrom: string = "auto"
 ): Promise<any | undefined> {
 	try {
-		const res : Response= await bingTranslate.getTranslations(TranslateText, TranslateTo, TranslateFrom);
-		var _text : { [key: string]: string } = {};
-		for (const [Lang, Text] of Object.entries(res.translations)) 
-			_text[Text.to as string] = Text.text as string
-		console.log("text",_text);
+		const res: Response = await bingTranslate.getTranslations(TranslateText, TranslateTo, TranslateFrom);
+		var _text: { [key: string]: string } = {};
+		for (const [Lang, Text] of Object.entries(res.translations)) _text[Text.to as string] = Text.text as string;
+		console.log("text", _text);
 		return _text;
 	} catch (err) {
-		/* console.error(err);
-		vscode.window.showErrorMessage("Caught error with translation of: " + TranslateText); */
+		visual.visualError(TranslateText);
 	}
 }
 
@@ -76,7 +90,7 @@ export async function multiTranslate(
 
 export async function multiTextTranslate(
 	TranslateText: string[],
-	TranslateTo: string = "en",
+	TranslateTo: string = config.Lang,
 	TranslateFrom: string = "auto"
 ): Promise<string[] | undefined> {
 	return [];
@@ -91,7 +105,7 @@ export async function multiTextTranslate(
  */
 
 export function getCurrentShorts(Languages: string[]): string[] {
-    var aLn_List = [];
+	var aLn_List = [];
 	for (const [key, value] of Object.entries(aLn)) {
 		aLn_List.push(key);
 	}

@@ -21,7 +21,7 @@
 	"activationEvents": [
 		"onStartupFinished"
 	],
-	"main": "./out/src/extension.js",
+	"main": "./out/src/extensions.js",
 	"contributes": {
 		"configuration": {
 			"title": "Anno Translation Tool",

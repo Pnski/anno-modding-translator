@@ -13,7 +13,7 @@ interface ModOpsContainer {
 	[key: string]: any;
 }
 
-export async function _gModOps(pXML: ModOpsContainer, loca: string[], optComm?: string): Promise<any> {
+export async function TextsTranslation(pXML: ModOpsContainer, loca: string[], optComm?: string): Promise<any> {
 	let _pXML: { [key: string]: ModOpsContainer } = {};
 	loca.forEach(el => (_pXML[el] = structuredClone(pXML)));
 	if (Array.isArray(pXML.ModOps)) {

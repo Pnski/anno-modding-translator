@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import {} from '../lang/scripts/handleProvider'
+import {} from "../lang/scripts/handleProvider";
 
 import { MET } from "bing-translate-api";
 
@@ -18,21 +18,19 @@ vscode.workspace.onDidChangeConfiguration(e => {
 	}
 });
 
-function addComments(CommentObject : any, _Text : string) : void{
-	if ((typeof CommentObject.comment == "undefined") && (config.enable || config.sourceString)) {
+function addComments(CommentObject: any, _Text: string): void {
+	if (typeof CommentObject.comment == "undefined" && (config.enable || config.sourceString)) {
 		CommentObject.comment = [];
 	}
 	if (config.enable) {
-		CommentObject.comment.push('<!--'+config.text+'-->')
+		CommentObject.comment.push("<!--" + config.text + "-->");
 	}
 	if (config.sourceString) {
-		CommentObject.comment.push('<!--'+_Text+'-->')
+		CommentObject.comment.push("<!--" + _Text + "-->");
 	}
 }
 
-function doTranslate(_object:any, _text:string):any{
-
-}
+function doTranslate(_object: any, _text: string): any {}
 
 interface ModOp {
 	Text: string | Array<any>;

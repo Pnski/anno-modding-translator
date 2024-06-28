@@ -1,13 +1,17 @@
 import * as vscode from "vscode";
 import * as bt from "bing-translate-api";
 
-interface translateOptions {
+const options = require("./bingConfig");
+
+import * as visual from "../../../message/messageHandler";
+
+/* interface translateOptions {
 	textType : any
 }
 
 const options : translateOptions =  {
 	textType: 'html'
-}
+} */
 
 /**
  * To translate single entitity
@@ -40,16 +44,18 @@ export async function singleTranslate(TranslateText: string, TranslateTo: string
  * @returns {Promise<string | undefined>}
  */
 
-export async function multiTranslate(TranslateText: string, TranslateTo: string[], TranslateFrom?: string | null): Promise<{ [key: string]: string }> {
+export async function multiTranslate(
+	TranslateText: string,
+	TranslateTo: string[],
+	TranslateFrom?: string | null
+): Promise<{ [key: string]: string }> {
 	try {
 		const res = await bt.MET.translate(TranslateText, TranslateFrom, TranslateTo);
-		var _text : { [key: string]: string } = {};
-		for (const [Lang, Text] of Object.entries(res[0].translations)) 
-			_text[Text.to] = (Text.text)
-		console.log("text",_text);
+		var _text: { [key: string]: string } = {};
+		for (const [Lang, Text] of Object.entries(res[0].translations)) _text[Text.to] = Text.text;
+		console.log("text", _text);
 		return _text;
 	} catch (err) {
-		console.error(err);
-		vscode.window.showErrorMessage("Caught error with translation of: " + TranslateText);
+		visual.visualError(TranslateText);
 	}
 }

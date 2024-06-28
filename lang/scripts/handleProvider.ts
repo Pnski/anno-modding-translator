@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import aLn from "../config/AnnoLanguages";
 import * as libreTranslate from "./Libre/LibreProvider";
 import * as bingTranslate from "./Bing/bingProvider";
+import * as wiki from "./wiktionary/wiktionaryProvider";
 
 import * as visual from "../../message/messageHandler";
 
@@ -18,8 +19,6 @@ vscode.workspace.onDidChangeConfiguration(e => {
 		config = vscode.workspace.getConfiguration("amt.Translation");
 	}
 });
-
-libreTranslate.singleTranslate('harley quinn fischt frische fische','auto');
 
 interface Translation {
 	to: string;
@@ -43,13 +42,13 @@ interface Response {
 export async function singleTranslate(
 	TranslateText: string,
 	TranslateTo: string = config.Lang,
-	TranslateFrom: string = "auto"
+	TranslateFrom: string = null
 ): Promise<string | undefined> {
 	try {
 		if (config.Provider == "BingTranslate") {
-			var res = bingTranslate.singleTranslate(TranslateText, TranslateFrom, TranslateTo);
+			var res = await bingTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
 		} else {
-			var res = libreTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
+			var res = await libreTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
 		}
 		return await res;
 	} catch (err) {
@@ -122,13 +121,20 @@ export function getCurrentShorts(Languages: string[]): string[] {
  * To translate single entitity
  *
  * @param {string[]} Languages content to be translated
- * @param {string[]} filesDir target language code. `en` by default.
  *
  * @returns {Promise<string[]>}
  */
 
-export function getMissingShorts(Languages: string[], filesDir: string[]): string[] {
-	return [];
+export function getMissingShorts(Languages: string[]): string[] {
+	console.error("input", Languages);
+	let _res: string[] = [];
+	for (const item in aLn)
+		if (Languages.indexOf(item) < 0) {
+			_res.push(item);
+		}
+	//let _res = aLn.filter( (item : string) => Languages.indexOf(item) < 0);
+	console.error("missing:", _res);
+	return _res;
 }
 /* 
 export function getALanguages(filePath: string, aLn: { [key: string]: string }): string[][] {

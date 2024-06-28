@@ -14,21 +14,21 @@ export async function _multiFile(filePath: string): Promise<void> {
 	}
 	const pXML = await readXML(filePath);
 
-    let _cLang: string[] = [];
-	for (const i of readDir(filePath)) {
-		_cLang.push(i.match("texts_(.*).xml")[1]);
-	}
-	let _mLang = getMissingShorts(_cLang, getCurrentShorts([loca]));
-	var filesDir =  _mLang
-
 	const diffLang = await vscode.window
 		.showInformationMessage("Do you want to recreate ALL other languages extept for " + loca + " ?", "Yes", "No")
 		.then(answer => {
-			if (answer === "Yes")
-				// delete all other files first than get diff
-				return getMissingShorts([loca], filesDir);
-			else return getMissingShorts([loca], filesDir);
+			if (answer === "Yes") {
+				// ignore all get full diff
+				return getMissingShorts([loca]);
+			} else {
+				var _cLang: string[] = [];
+				for (const i of readDir(filePath)) {
+					_cLang.push(i.match("texts_(.*).xml")[1]);
+				}
+				return getMissingShorts(_cLang);
+			}
 		});
+	console.error(diffLang);
 	let config = vscode.workspace.getConfiguration("anno-modding-translator.defaultComment");
 	await vscode.window.withProgress(
 		{
@@ -40,8 +40,7 @@ export async function _multiFile(filePath: string): Promise<void> {
 			if (config.enable) {
 				_get = await TextsTranslation(
 					pXML,
-					diffLang.map(_short => aLn[_short]),
-					config.text
+					diffLang.map(_short => aLn[_short])
 				);
 			} else {
 				console.log("get here");

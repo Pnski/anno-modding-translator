@@ -4,11 +4,11 @@ import aLn from "../config/AnnoLanguages";
 import * as libreTranslate from "./Libre/LibreProvider";
 import * as bingTranslate from "./Bing/bingProvider";
 
-import * as visual from '../../message/messageHandler'
+import * as visual from "../../message/messageHandler";
 
 /**
- * @{string} .Lang
- * @{string} .Provider
+ * @{string} .Lang  // _short
+ * @{string} .Provider //BingTranslate, LibreTranslate, GoogleTranslate
  */
 
 var config: any = vscode.workspace.getConfiguration("amt.Translation");
@@ -18,6 +18,8 @@ vscode.workspace.onDidChangeConfiguration(e => {
 		config = vscode.workspace.getConfiguration("amt.Translation");
 	}
 });
+
+libreTranslate.singleTranslate('harley quinn fischt frische fische','auto');
 
 interface Translation {
 	to: string;
@@ -44,7 +46,11 @@ export async function singleTranslate(
 	TranslateFrom: string = "auto"
 ): Promise<string | undefined> {
 	try {
-		var res = bingTranslate.getTranslation(TranslateText, TranslateFrom, TranslateTo);
+		if (config.Provider == "BingTranslate") {
+			var res = bingTranslate.singleTranslate(TranslateText, TranslateFrom, TranslateTo);
+		} else {
+			var res = libreTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
+		}
 		return await res;
 	} catch (err) {
 		visual.visualError(TranslateText);
@@ -68,7 +74,7 @@ export async function multiTranslate(
 	TranslateFrom: string = "auto"
 ): Promise<any | undefined> {
 	try {
-		const res: Response = await bingTranslate.getTranslations(TranslateText, TranslateTo, TranslateFrom);
+		const res: Response = await bingTranslate.multiTranslate(TranslateText, TranslateTo, TranslateFrom);
 		var _text: { [key: string]: string } = {};
 		for (const [Lang, Text] of Object.entries(res.translations)) _text[Text.to as string] = Text.text as string;
 		console.log("text", _text);

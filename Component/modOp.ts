@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 
+import {} from '../lang/scripts/handleProvider'
+
 import { MET } from "bing-translate-api";
 
 /**
@@ -16,6 +18,22 @@ vscode.workspace.onDidChangeConfiguration(e => {
 	}
 });
 
+function addComments(CommentObject : any, _Text : string) : void{
+	if ((typeof CommentObject.comment == "undefined") && (config.enable || config.sourceString)) {
+		CommentObject.comment = [];
+	}
+	if (config.enable) {
+		CommentObject.comment.push('<!--'+config.text+'-->')
+	}
+	if (config.sourceString) {
+		CommentObject.comment.push('<!--'+_Text+'-->')
+	}
+}
+
+function doTranslate(_object:any, _text:string):any{
+
+}
+
 interface ModOp {
 	Text: string | Array<any>;
 	comment: string[];
@@ -29,7 +47,7 @@ interface ModOpsContainer {
 	[key: string]: any;
 }
 
-export async function TextsTranslation(pXML: ModOpsContainer, loca: string[], optComm?: string): Promise<any> {
+export async function TextsTranslation(pXML: ModOpsContainer, loca: string[]): Promise<any> {
 	let _pXML: { [key: string]: ModOpsContainer } = {};
 	loca.forEach(el => (_pXML[el] = structuredClone(pXML)));
 	if (Array.isArray(pXML.ModOps)) {
@@ -50,12 +68,9 @@ export async function TextsTranslation(pXML: ModOpsContainer, loca: string[], op
 								}
 							});
 							for (var i = 0; i < _get[0].translations.length; i++) {
-								if (typeof _pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment == "undefined") {
-									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment = [];
-								}
 								if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text != _get[0].translations[i].text) {
 									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text = _get[0].translations[i].text;
-									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment.push(optComm);
+									//_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment.push(optComm);
 								}
 							}
 						}
@@ -75,12 +90,9 @@ export async function TextsTranslation(pXML: ModOpsContainer, loca: string[], op
 									}
 								});
 								for (var i = 0; i < _get[0].translations.length; i++) {
-									if (typeof _pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment == "undefined") {
-										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment = [];
-									}
 									if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text != _get[0].translations[i].text) {
 										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
-										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment.push(optComm);
+										//_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment.push(optComm);
 									}
 								}
 							}

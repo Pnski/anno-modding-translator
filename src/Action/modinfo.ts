@@ -13,9 +13,9 @@ function readJson(filePath: string): any {
 	}
 }
 
-async function writeJSON(filePath: string, pJson: any) {
+function writeJSON(filePath: string, pJson: any) {
 	const data = new Uint8Array(Buffer.from(JSON.stringify(pJson, null, "\t")));
-	await writeFile(filePath, data, err => {
+	writeFile(filePath, data, err => {
 		if (err) throw err;
 		vscode.window.showInformationMessage("File has been saved!");
 	});

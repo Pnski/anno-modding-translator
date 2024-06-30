@@ -4,6 +4,11 @@ import aLn from "../config/AnnoLanguages";
 import * as libreTranslate from "./Libre/LibreProvider";
 import * as bingTranslate from "./Bing/bingProvider";
 import * as wiki from "./wiktionary/wiktionaryProvider";
+import * as googleTranslate from './Google/googleProvider'
+
+console.error("google")
+console.log(googleTranslate.paraphrase())
+console.log(googleTranslate.paraphrase2())
 
 import * as visual from "../../message/messageHandler";
 

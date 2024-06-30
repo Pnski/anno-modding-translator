@@ -106,6 +106,13 @@
 					],
 					"default": "BingTranslate",
 					"markdownDescription": "Choose a translation provider, currently none with API-Key are used. (Google not working do not use)."
+				},
+				"amt.Google.Key": {
+					"title": "Google API Key",
+					"type": "string",
+					"editPresentation": "singlelineText",
+					"default": "Your Google API Key",
+					"markdownDescription": "https://aistudio.google.com/app/apikey"
 				}
 			}
 		},
@@ -219,6 +226,8 @@
 		"typescript": "^5.4.5"
 	},
 	"dependencies": {
+		"@google-ai/generativelanguage": "^2.6.0",
+		"@google/generative-ai": "^0.14.0",
 		"bing-translate-api": "^4.0.2",
 		"fast-xml-parser": "^4.4.0",
 		"fs": "^0.0.1-security",

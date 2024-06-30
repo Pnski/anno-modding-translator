@@ -13,11 +13,13 @@ vscode.workspace.onDidChangeConfiguration(e => {
 
 export const Lan = "*";
 
+//https://aistudio.google.com/app/apikey
+
 export const Provider: vscode.HoverProvider = {
 	async provideHover(document, position, token) {
 		let word = document.getText(document.getWordRangeAtPosition(position));
 		let hover = await singleTranslate(word, config.Lang);
 		let wiki = await wiktionaryLookup(hover, config.Lang);
-		return new vscode.Hover(hover + "🔹<br/>" + wiki + "🔹");
+		return new vscode.Hover(hover + "🔹  \n" + wiki + "  \n🔹");
 	}
 };

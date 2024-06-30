@@ -7,6 +7,8 @@ vscps-preview.zip
 *.vsix
 /.rst
 
+*api.key
+
 install\.Lock
 
 test-resources/sphinx/_build/html/

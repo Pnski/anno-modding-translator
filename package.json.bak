@@ -55,3 +55,9 @@
 					],
 					"markdownDescription": "Default language for inline translation."
 				},
+
+
+                "@types/xml2js": "^0.4.14",
+		"@typescript-eslint/eslint-plugin": "^7.11.0",
+		"@typescript-eslint/parser": "^7.11.0",
+		"eslint": "^8.57.0",

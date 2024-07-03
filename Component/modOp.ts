@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import {} from "../lang/scripts/handleProvider";
+import { multiTranslate } from "../lang/scripts/handleProvider";
 
 import { MET } from "bing-translate-api";
 
@@ -60,15 +60,17 @@ export async function TextsTranslation(pXML: ModOpsContainer, loca: string[]): P
 						if (value.Text.length == 0) {
 							console.error("Empty Text detected skipping!");
 						} else {
-							let _get = await MET.translate(value.Text, null, loca, {
+							let _get = await multiTranslate(value.Text, loca);
+							/* let _get = await MET.translate(value.Text, null, loca, {
 								translateOptions: {
 									textType: "html" as unknown as object
 								}
-							});
+							}); */
 							for (var i = 0; i < _get[0].translations.length; i++) {
 								if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text != _get[0].translations[i].text) {
 									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text = _get[0].translations[i].text;
 									//_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment.push(optComm);
+									addComments(_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text, _get[0].translations[i].text);
 								}
 							}
 						}
@@ -81,16 +83,21 @@ export async function TextsTranslation(pXML: ModOpsContainer, loca: string[]): P
 							if (value.Text[_TextIndex].Text.length == 0) {
 								console.error("Empty Text detected skipping!");
 							} else {
-								let _get = await MET.translate(value.Text[_TextIndex].Text, null, loca, {
+								let _get = await multiTranslate(value.Text[_TextIndex].Text, loca);
+								/* let _get = await MET.translate(value.Text[_TextIndex].Text, null, loca, {
 									translateOptions: {
 										// Explicitly set textType as `html`. Defaults to `plain`.
 										textType: "html" as unknown as object
 									}
-								});
+								}); */
 								for (var i = 0; i < _get[0].translations.length; i++) {
 									if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text != _get[0].translations[i].text) {
 										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
 										//_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment.push(optComm);
+										addComments(
+											_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text,
+											_get[0].translations[i].text
+										);
 									}
 								}
 							}

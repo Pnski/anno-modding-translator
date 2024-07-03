@@ -63,7 +63,7 @@ used for hover - better text, the free variant doesn't require a creditcard, onl
 | --- | --- |
 | ctrl+alt+t | Autotranslate: Modinfo |
 | ctrl+alt+z | Autotranslate: Single File |
-| ctrl+alt+y | Inline |
+| ctrl+alt+y | Autotranslate: from File |
 
 ---
 ## Feature Details

@@ -22,7 +22,6 @@ export async function _singleFile(filePath: string): Promise<void> {
 			cancellable: false
 		},
 		async (progress, token) => {
-			console.log("get here");
 			if (config.enable) {
 				_get = await TextsTranslation(pXML, [aLn[loca.toLowerCase()]]);
 			} else {

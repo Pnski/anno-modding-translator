@@ -23,10 +23,10 @@ function addComments(CommentObject: any, _Text: string): void {
 		CommentObject.comment = [];
 	}
 	if (config.enable) {
-		CommentObject.comment.push("<!--" + config.text + "-->");
+		CommentObject.comment.push(config.text);
 	}
 	if (config.sourceString) {
-		CommentObject.comment.push("<!--" + _Text + "-->");
+		CommentObject.comment.push(_Text);
 	}
 }
 
@@ -61,16 +61,11 @@ export async function TextsTranslation(pXML: ModOpsContainer, loca: string[]): P
 							console.error("Empty Text detected skipping!");
 						} else {
 							let _get = await multiTranslate(value.Text, loca);
-							/* let _get = await MET.translate(value.Text, null, loca, {
-								translateOptions: {
-									textType: "html" as unknown as object
-								}
-							}); */
-							for (var i = 0; i < _get[0].translations.length; i++) {
-								if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text != _get[0].translations[i].text) {
-									_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text = _get[0].translations[i].text;
+							for (var [_key, _var] of Object.entries(_get)) {
+								if (_pXML[_key].ModOps.ModOp[parseInt(key)].Text != _var) {
+									_pXML[_key].ModOps.ModOp[parseInt(key)].Text = _var as string;
 									//_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].comment.push(optComm);
-									addComments(_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text, _get[0].translations[i].text);
+									addComments(_pXML[_key].ModOps.ModOp[parseInt(key)].Text, value.Text);
 								}
 							}
 						}
@@ -83,20 +78,13 @@ export async function TextsTranslation(pXML: ModOpsContainer, loca: string[]): P
 							if (value.Text[_TextIndex].Text.length == 0) {
 								console.error("Empty Text detected skipping!");
 							} else {
-								let _get = await multiTranslate(value.Text[_TextIndex].Text, loca);
-								/* let _get = await MET.translate(value.Text[_TextIndex].Text, null, loca, {
-									translateOptions: {
-										// Explicitly set textType as `html`. Defaults to `plain`.
-										textType: "html" as unknown as object
-									}
-								}); */
-								for (var i = 0; i < _get[0].translations.length; i++) {
-									if (_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text != _get[0].translations[i].text) {
-										_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _get[0].translations[i].text;
-										//_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].comment.push(optComm);
+								var _get: any = await multiTranslate(value.Text[_TextIndex].Text, loca);
+								for (var [_key, _var] of Object.entries(_get)) {
+									if (_pXML[_key].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text != _var) {
+										_pXML[_key].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text = _var;
 										addComments(
-											_pXML[_get[0].translations[i].to].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)].Text,
-											_get[0].translations[i].text
+											_pXML[_key].ModOps.ModOp[parseInt(key)].Text[parseInt(_TextIndex)],
+											_key+": "+value.Text[_TextIndex].Text
 										);
 									}
 								}

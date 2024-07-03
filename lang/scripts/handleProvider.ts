@@ -74,13 +74,14 @@ export async function multiTranslate(
 	TranslateFrom: string = "auto"
 ): Promise<any | undefined> {
 	try {
-		const res: Response = await bingTranslate.multiTranslate(TranslateText, TranslateTo, TranslateFrom);
-		var _text: { [key: string]: string } = {};
-		for (const [Lang, Text] of Object.entries(res.translations)) _text[Text.to as string] = Text.text as string;
-		console.log("text", _text);
-		return _text;
+		var res: Response = await bingTranslate.multiTranslate(TranslateText, TranslateTo, TranslateFrom);
+		//var _text: { [key: string]: string } = {};
+		//for (const [Lang, Text] of Object.entries(res.translations)) _text[Text.to as string] = Text.text as string;
+		//console.log("text provider multi", res);
+		//let _res = Array.isArray(res) ? res : [res]
+		return res;
 	} catch (err) {
-		visual.visualError(TranslateText);
+		visual.visualError(TranslateText+"test2");
 	}
 }
 
@@ -127,14 +128,12 @@ export function getCurrentShorts(Languages: string[]): string[] {
  */
 
 export function getMissingShorts(Languages: string[]): string[] {
-	console.error("input", Languages);
 	let _res: string[] = [];
 	for (const item in aLn)
 		if (Languages.indexOf(item) < 0) {
 			_res.push(item);
 		}
 	//let _res = aLn.filter( (item : string) => Languages.indexOf(item) < 0);
-	console.error("missing:", _res);
 	return _res;
 }
 /* 

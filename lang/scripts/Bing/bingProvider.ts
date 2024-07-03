@@ -17,10 +17,11 @@ import * as visual from "../../../message/messageHandler";
 
 export async function singleTranslate(TranslateText: string, TranslateTo: string, TranslateFrom?: string | null): Promise<string> {
 	try {
+		console.log(TranslateText, TranslateFrom, TranslateTo);
 		var res = bt.translate(TranslateText, TranslateFrom, TranslateTo);
 		return (await res).translation;
 	} catch (err) {
-		console.error("Caught error in machinetranslation of " + TranslateText + " due to unknown reason (internet related).");
+		console.error("Caught error in machinetranslation of " + TranslateText + " due to unknown reason (testinternet related).");
 		vscode.window.showErrorMessage("Caught error with translation of: " + TranslateText);
 		return TranslateText;
 	}
@@ -42,12 +43,13 @@ export async function multiTranslate(
 	TranslateFrom?: string | null
 ): Promise<{ [key: string]: string }> {
 	try {
-		const res = await bt.MET.translate(TranslateText, TranslateFrom, TranslateTo,options);
+		const res = await bt.MET.translate(TranslateText, TranslateFrom, TranslateTo, options);
 		var _text: { [key: string]: string } = {};
-		for (const [Lang, Text] of Object.entries(res[0].translations)) _text[Text.to] = Text.text;
-		console.log("text", _text);
+		for (const [Lang, Text] of Object.entries(res[0].translations)) {
+			_text[Text.to] = Text.text;
+		}
 		return _text;
 	} catch (err) {
-		visual.visualError(TranslateText);
+		visual.visualError(TranslateText+"test");
 	}
 }

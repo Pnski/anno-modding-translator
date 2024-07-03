@@ -43,12 +43,10 @@ export async function _multiFile(filePath: string): Promise<void> {
 					diffLang.map(_short => aLn[_short])
 				);
 			} else {
-				console.log("get here");
 				_get = await TextsTranslation(
 					pXML,
 					diffLang.map(_short => aLn[_short])
 				);
-				console.log("get here2", _get);
 			}
 		}
 	);

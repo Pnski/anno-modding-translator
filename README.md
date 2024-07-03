@@ -5,12 +5,14 @@ This project is not affiliated in any way with Ubisoft.
 Anno 1800 is a trademark of Ubisoft Entertainment in the US and/or other countries. Anno is a trademark of Ubisoft GmbH in the US and/or other countries.
 
 ## Feature Overview
+
 - [Autotranslate: Modinfo](#autotranslate-modinfo)
-  - test
+  - Translates the 4 multilang-categorys of modinfo into the corresponding language, if filled
 - [Autotranslate: Single File](#autotranslate-single-file)
+  - Translates the current File into the filename language
 - [Autotranslate: from This](#autotranslate-from-this)
-- Commands
-  - 
+  - Translates from the current File into the anno-aviable languages
+
 ---
 
 ## Limits

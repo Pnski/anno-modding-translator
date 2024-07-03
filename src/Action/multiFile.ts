@@ -28,7 +28,6 @@ export async function _multiFile(filePath: string): Promise<void> {
 				return getMissingShorts(_cLang);
 			}
 		});
-	console.error(diffLang);
 	let config = vscode.workspace.getConfiguration("anno-modding-translator.defaultComment");
 	await vscode.window.withProgress(
 		{
@@ -50,7 +49,6 @@ export async function _multiFile(filePath: string): Promise<void> {
 			}
 		}
 	);
-	console.log(_get);
 	vscode.window.showWarningMessage("Translation complete, attempting to write file.");
 	diffLang.forEach(_lang => {
 		writeXML(filePath.substring(0, filePath.lastIndexOf("\\") + 1) + "texts_" + _lang + ".xml", _get[aLn[_lang]]);

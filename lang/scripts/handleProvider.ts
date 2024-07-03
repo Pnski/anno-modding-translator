@@ -6,10 +6,6 @@ import * as bingTranslate from "./Bing/bingProvider";
 import * as wiki from "./wiktionary/wiktionaryProvider";
 import * as googleTranslate from './Google/googleProvider'
 
-console.error("google")
-console.log(googleTranslate.paraphrase())
-console.log(googleTranslate.paraphrase2())
-
 import * as visual from "../../message/messageHandler";
 
 /**
@@ -51,9 +47,9 @@ export async function singleTranslate(
 ): Promise<string | undefined> {
 	try {
 		if (config.Provider == "BingTranslate") {
-			var res = await bingTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
+			var res = bingTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
 		} else {
-			var res = await libreTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
+			var res = libreTranslate.singleTranslate(TranslateText, TranslateTo, TranslateFrom);
 		}
 		return await res;
 	} catch (err) {

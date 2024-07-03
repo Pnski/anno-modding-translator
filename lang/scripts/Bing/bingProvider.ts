@@ -5,14 +5,6 @@ const options = require("./bingConfig");
 
 import * as visual from "../../../message/messageHandler";
 
-/* interface translateOptions {
-	textType : any
-}
-
-const options : translateOptions =  {
-	textType: 'html'
-} */
-
 /**
  * To translate single entitity
  *
@@ -50,7 +42,7 @@ export async function multiTranslate(
 	TranslateFrom?: string | null
 ): Promise<{ [key: string]: string }> {
 	try {
-		const res = await bt.MET.translate(TranslateText, TranslateFrom, TranslateTo);
+		const res = await bt.MET.translate(TranslateText, TranslateFrom, TranslateTo,options);
 		var _text: { [key: string]: string } = {};
 		for (const [Lang, Text] of Object.entries(res[0].translations)) _text[Text.to] = Text.text;
 		console.log("text", _text);

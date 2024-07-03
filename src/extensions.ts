@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext): any {
 		context.subscriptions.push(disposable);
 	});
 
-	vscode.languages.registerHoverProvider(HoverProvider.Lan, HoverProvider.Provider);
+	//vscode.languages.registerHoverProvider(HoverProvider.Lan, HoverProvider.Provider);
 }
 
 export function deactivate() {}

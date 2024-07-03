@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { readFileSync, writeFile } from "fs";
-import {multiTextTranslate} from '../../lang/scripts/handleProvider'
+import { singleTranslate } from "../../lang/scripts/handleProvider";
 import aLn from "../../lang/config/AnnoLanguages";
 
 function readJson(filePath: string): any {
@@ -23,6 +23,8 @@ function writeJSON(filePath: string, pJson: any) {
 
 export async function ModInfo(filePath: string): Promise<any> {
 	const pJson = await readJson(filePath);
+	const modinfoCategory: string[] = ["Category", "ModName", "Description", "KnownIssues"];
+	//console.log(pJson, modinfoCategory);
 	// .Category .ModName .Description
 	await vscode.window.withProgress(
 		{
@@ -33,23 +35,25 @@ export async function ModInfo(filePath: string): Promise<any> {
 		async (progress, token) => {
 			var i: number = 0;
 			progress.report({
-				message: `${Math.trunc((i / 3) * 100)}%`,
+				message: `${Math.trunc((i / 4) * 100)}%`,
 				increment: 0
 			});
-			for (let jsonCat of ["Category", "ModName", "Description"]) {
-				for (const [key, value] of Object.entries(pJson[jsonCat])) {
-					if (value !== null) {
-						pJson[jsonCat][key] = await multiTextTranslate(pJson[jsonCat][key], aLn[key.toLowerCase()]);
+			for (let jsonCat of modinfoCategory) {
+				try {
+					for (const [key, value] of Object.entries(pJson[jsonCat])) {
+						if (value !== null) {
+							pJson[jsonCat][key] = await singleTranslate(value as string, aLn[key.toLowerCase()]);
+						}
 					}
-				}
+				} catch {console.log("Category '"+jsonCat+"' not found, continue.")}
 				i++;
 				progress.report({
-					message: `${Math.trunc((i / 3) * 100)}%`,
-					increment: 100 / 3
+					message: `${Math.trunc((i / 4) * 100)}%`,
+					increment: 100 / 4
 				});
 			}
 		}
 	);
-	await writeJSON(filePath, pJson);
+	writeJSON(filePath, pJson);
 	vscode.window.showInformationMessage("modinfo.json translated, check new values manually");
 }

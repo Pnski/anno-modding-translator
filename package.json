@@ -2,7 +2,7 @@
 	"name": "amt",
 	"displayName": "Anno Modding Translator",
 	"description": "translate texts.xml",
-	"version": "0.0.7",
+	"version": "0.1.0",
 	"icon": "img/icon.png",
 	"publisher": "pnski",
 	"sponsor": {
@@ -26,51 +26,6 @@
 		"configuration": {
 			"title": "Anno Translation Tool",
 			"properties": {
-				"amt.Translation.Lang": {
-					"type": "string",
-					"default": "en",
-					"description": "Default Language",
-					"enum": [
-						"zh-Hans",
-						"zh-Hant",
-						"en",
-						"fr",
-						"de",
-						"it",
-						"ja",
-						"ko",
-						"pl",
-						"ru",
-						"es"
-					],
-					"enumItemLabels": [
-						"Chinese",
-						"Taiwanese",
-						"English",
-						"French",
-						"German",
-						"Italian",
-						"Japanese",
-						"Korean",
-						"Polish",
-						"Russian",
-						"Spanish"
-					],
-					"enumDescriptions": [
-						"中文",
-						"臺灣的",
-						"English",
-						"Français",
-						"Deutsch",
-						"Italiano",
-						"日本語",
-						"한국어",
-						"Polski",
-						"Русский",
-						"Español"
-					],
-					"markdownDescription": "Default language for inline translation."
-				},
 				"amt.Comment.sourceString": {
 					"title": "Comments with SourceString",
 					"type": "boolean",
@@ -95,9 +50,7 @@
 					"type": "string",
 					"description": "Default translation provider.",
 					"enum": [
-						"BingTranslate",
-						"LibreTranslate",
-						"GoogleTranslate"
+						"BingTranslate"
 					],
 					"enumDescriptions": [
 						"Translation with translate.bing.com",
@@ -106,13 +59,6 @@
 					],
 					"default": "BingTranslate",
 					"markdownDescription": "Choose a translation provider, currently none with API-Key are used. (Google not working do not use)."
-				},
-				"amt.Google.Key": {
-					"title": "Google API Key",
-					"type": "string",
-					"editPresentation": "singlelineText",
-					"default": "Your Google API Key",
-					"markdownDescription": "https://aistudio.google.com/app/apikey"
 				}
 			}
 		},
@@ -123,9 +69,9 @@
 				"title": "Hello World"
 			},
 			{
-				"command": "amt.Modinfo",
+				"command": "amt.modInfo",
 				"category": "AnnoTranslate",
-				"title": "Modinfo"
+				"title": "Autotranslate: Modinfo"
 			},
 			{
 				"command": "amt.singleFile",
@@ -145,7 +91,7 @@
 		],
 		"keybindings": [
 			{
-				"command": "amt.Modinfo",
+				"command": "amt.modInfo",
 				"key": "ctrl+alt+t",
 				"mac": "shift+cmd+t"
 			},
@@ -164,10 +110,10 @@
 			"commandPalette": [
 				{
 					"command": "amt.testingStuff",
-					"when": "true"
+					"when": "false"
 				},
 				{
-					"command": "amt.Modinfo",
+					"command": "amt.modInfo",
 					"when": "resourceFilename =~ /modinfo.json$/"
 				},
 				{
@@ -180,22 +126,22 @@
 				},
 				{
 					"command": "amt.multiFile",
-					"when": "true"
+					"when": "resourceFilename =~ /texts_.+xml$/"
 				}
 			],
 			"explorer/context": [
 				{
 					"command": "amt.testingStuff",
-					"when": "true",
+					"when": "false",
 					"group": "AnnoTranslate"
 				},
 				{
 					"command": "amt.multiFile",
-					"when": "true",
+					"when": "resourceFilename =~ /texts_.+xml$/",
 					"group": "AnnoTranslate"
 				},
 				{
-					"command": "amt.Modinfo",
+					"command": "amt.modInfo",
 					"when": "resourceFilename =~ /modinfo.json$/",
 					"group": "AnnoTranslate"
 				},

@@ -2,7 +2,7 @@
 	"name": "amt",
 	"displayName": "Anno Modding Translator",
 	"description": "translate texts.xml",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"icon": "img/icon.png",
 	"publisher": "pnski",
 	"sponsor": {
@@ -21,7 +21,7 @@
 	"activationEvents": [
 		"onStartupFinished"
 	],
-	"main": "./out/src/extensions.js",
+	"main": "./dist/extensions.js",
 	"contributes": {
 		"configuration": {
 			"title": "Anno Translation Tool",
@@ -154,18 +154,27 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile && npm run lint",
+		"download": "bash -c '(cd external; ./download.sh)'",
+		"vscode:prepublish": "webpack --mode production",
+		"compile": "webpack --mode none",
+		"watch": "webpack --mode none --watch",
+		"pretest": "tsc -p ./ && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "vscode-test"
+		"test": "node ./out/test/runTest.js",
+		"assets": "tsc -p ./ && node ./out/scripts/compileAssets.js c:/anno/all-rda/data/config/export/main/asset/assets.xml",
+		"height": "tsc -p ./ && node ./out/scripts/heightmap.js ./generated/update.xml",
+		"buildmod:compile": "tsc -p ./",
+		"buildmod:pack": "npm run buildmod:compile && npm pack"
 	},
 	"devDependencies": {
 		"@types/google-translate-api": "^2.3.5",
 		"@types/node": "20.x",
 		"@types/vscode": "^1.90.0",
-		"typescript": "^5.4.5"
+		"esbuild": "^0.23.0",
+		"ts-loader": "^9.5.1",
+		"typescript": "^5.4.5",
+		"webpack": "^5.92.1",
+		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
 		"@google-ai/generativelanguage": "^2.6.0",

@@ -1,5 +1,7 @@
-*.js
-*.map
-.vscode/
-node_modules/
-.vscode-test/
+.vscode
+node_modules
+**/*.ts
+tsconfig.json
+webpack.config.js
+esbuild.js
+Migrate

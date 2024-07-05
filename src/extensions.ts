@@ -15,14 +15,12 @@ interface CommandContribution {
 }
 
 export function activate(context: vscode.ExtensionContext): any {
-	const { commands } = vscode.extensions.getExtension("Pnski.amt").packageJSON.contributes;
-
+	const { commands } = vscode.extensions.getExtension("pnski.amt").packageJSON.contributes;
 	commands.forEach(({ command, title }: CommandContribution) => {
 		// Use plain JavaScript to get the last element of the split command
 		const commandName = command.split(".").pop() as string;
 		const handler = Commands[commandName];
 		const disposable = vscode.commands.registerCommand(command, args => handler(args));
-
 		context.subscriptions.push(disposable);
 	});
 
